@@ -14,3 +14,4 @@ alembic
 mysqlclient
 mysql-connector-python
 email_validator
+pillow
