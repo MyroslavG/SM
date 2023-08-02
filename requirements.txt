@@ -1,11 +1,7 @@
 flask
 itsdangerous
-dotenv
 flask_wtf
 wtforms
 flask_login
-secrets
 flask_mail
-PIL 
-os
 datetime
