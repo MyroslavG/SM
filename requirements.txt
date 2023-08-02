@@ -11,4 +11,3 @@ flask_bcrypt
 flask_migrate
 sqlalchemy
 alembic
-MySQLdb
