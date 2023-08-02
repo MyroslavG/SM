@@ -17,7 +17,7 @@ build/
 .idea/
 docs/_build/
 .vscode
-static/images/
+flaskblog/static/images/
 site.db
 
 # Coverage reports
