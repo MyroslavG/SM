@@ -11,3 +11,5 @@ flask_bcrypt
 flask_migrate
 sqlalchemy
 alembic
+mysqlclient
+mysql-connector-python
