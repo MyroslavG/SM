@@ -1,5 +1,5 @@
 flask
-itsdangerous
+itsdangerous==2.0.1
 python-dotenv
 flask_wtf
 wtforms
