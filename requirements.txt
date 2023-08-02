@@ -1,5 +1,6 @@
 flask
 itsdangerous
+python-dotenv
 flask_wtf
 wtforms
 flask_login
