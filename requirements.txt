@@ -6,3 +6,6 @@ wtforms
 flask_login
 flask_mail
 datetime
+flask_sqlalchemy
+flask_bcrypt
+flask_migrate
