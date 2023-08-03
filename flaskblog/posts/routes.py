@@ -2,8 +2,9 @@ from flask import (render_template, url_for, flash,
                    redirect, request, abort, Blueprint)
 from flask_login import current_user, login_required
 from flaskblog import db
-from flaskblog.models import Post
+from flaskblog.models import User, Post, Like#, Comment
 from flaskblog.posts.forms import PostForm
+import urllib.parse
 
 posts = Blueprint('posts', __name__)
 
@@ -52,3 +53,39 @@ def delete_post(post_id):
     db.session.commit()
     flash('YOUR POST HAS BEEN DELETED!', 'success')
     return redirect(url_for('main.home'))
+
+@posts.route('/like_post/<int:post_id>', methods=['GET'])
+@login_required
+def like_post(post_id):
+    post = Post.query.filter_by(id=post_id)
+    like = Like.query.filter_by(
+        author=current_user.id, post_id=post_id).first()
+    if not post:
+        flash('POST DOES NOT EXIST', 'danger')
+    elif like:
+        db.session.delete(like)
+        db.session.commit()
+    else:
+        like = Like(author=current_user.id, post_id=post_id)    
+        db.session.add(like)
+        db.session.commit()
+    return redirect(url_for('main.home'))    
+
+@posts.route('/profile_like_post/<string:username>/<int:post_id>', methods=['GET'])
+@login_required
+def profile_like_post(username, post_id):
+    decoded_username = urllib.parse.unquote(username)
+    user = User.query.filter_by(username=decoded_username).first()
+    post = Post.query.filter_by(id=post_id, user_id=user.id)
+    like = Like.query.filter_by(
+        author=current_user.id, post_id=post_id).first()
+    if not post:
+        flash('POST DOES NOT EXIST', 'danger')
+    elif like:
+        db.session.delete(like)
+        db.session.commit()
+    else:
+        like = Like(author=current_user.id, post_id=post_id)    
+        db.session.add(like)
+        db.session.commit()
+    return redirect(url_for('users.profile', username=username))      

@@ -14,7 +14,9 @@ class User(db.Model, UserMixin):
     image_file = db.Column(db.String(20), nullable = False, default='default.jpg')  
     password = db.Column(db.String(60), nullable = False)
     posts = db.relationship('Post', backref = 'author', lazy = True)
-    #birthday = db.Column(db.String(20))
+    date_registered = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
+    likes = db.relationship('Like', backref = 'user', lazy = True)
+    comments = db.relationship('Comment', backref = 'user', lazy = True)
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)
@@ -38,6 +40,27 @@ class Post(db.Model):
     date_posted = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
     content = db.Column(db.Text, nullable = False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
+    likes = db.relationship('Like', backref = 'post', lazy = True)
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
+
+class Like(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    date_created = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
+    author = db.Column(db.Integer, db.ForeignKey(
+            'user.id', ondelete="CASCADE"), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey(
+            'post.id', ondelete="CASCADE"), nullable=False)
+
+    def __repr__(self):
+        return f"Like('{self.date_created}', '{self.author}', '{self.post_id}')"
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    text = db.Column(db.String(200), nullable = False)
+    date_created = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
+    author = db.Column(db.Integer, db.ForeignKey(
+            'user.id', ondelete="CASCADE"), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey(
+            'post.id', ondelete="CASCADE"), nullable=False)        

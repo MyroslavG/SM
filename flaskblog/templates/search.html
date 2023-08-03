@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% for user in users.items %}
+        <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/' + user.image_file) }}">
+        <h1><a href="{{ url_for('users.profile', search_query=user.search_query) }}">{{ user.username }}</a></h1>
+    {% endfor %}
+
+    <div class="pagination">
+        {% if users.has_prev %}
+            <a href="{{ url_for('users.search_users', username=search_query, page=users.prev_num) }}" class="btn btn-outline-primary">Previous</a>
+        {% endif %}
+        {% if users.has_next %}
+            <a href="{{ url_for('users.search_users', username=search_query, page=users.next_num) }}" class="btn btn-outline-primary">Next</a>
+        {% endif %}
+    </div>
+{% endblock content %}    

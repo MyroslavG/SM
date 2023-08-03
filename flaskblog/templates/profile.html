@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
+    <h1 style="text-transform:uppercase">{{ user.username }}</h1>
     {% for post in posts.items %}
         <article class="media content-section">
             <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/' + post.author.image_file) }}">
@@ -12,24 +13,13 @@
                 <p class="article-content">{{ post.content }}</p>
                 <div>
                     {{ post.likes|length }}
-                    {% if post.author.id in post.likes|map(attribute="author")|list %}
-                        <a href="/like_post/{{ post.id }}"><i class="fa-solid fa-heart"></i></a>
+                    {% if user.id in post.likes|map(attribute="author")|list %}
+                        <a href="{{ url_for('posts.profile_like_post', username=user.username, post_id=post.id) }}"><i class="fa-regular fa-heart"></i></a>
                     {% else %}
-                        <a href="/like_post/{{ post.id }}"><i class="fa-regular fa-heart"></i></a>
+                        <a href="{{ url_for('posts.profile_like_post', username=user.username, post_id=post.id) }}"><i class="fa-solid fa-heart"></i></a>
                     {% endif %}
                 </div>
             </div>
         </article>
-    {% endfor %}     
-    {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-        {% if page_num %}
-            {% if posts.page == page_num %}
-                <a class="btn btn-info mb-4" href="{{ url_for('main.home', page=page_num) }}">{{ page_num }}</a>
-            {% else %}
-                <a class="btn btn-outline-info mb-4" href="{{ url_for('main.home', page=page_num) }}">{{ page_num }}</a>
-            {% endif %}
-        {% else %}
-
-        {% endif %}
-    {% endfor %}
-{% endblock content %}    
+    {% endfor %}  
+{% endblock content %}  
