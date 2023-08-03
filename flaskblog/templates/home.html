@@ -12,7 +12,7 @@
                 <p class="article-content">{{ post.content }}</p>
                 <div>
                     {{ post.likes|length }}
-                    {% if post.author.id in post.likes|map(attribute="author")|list %}
+                    {% if current_user.id in post.likes|map(attribute="author")|list %}
                         <a href="/like_post/{{ post.id }}"><i class="fa-solid fa-heart"></i></a>
                     {% else %}
                         <a href="/like_post/{{ post.id }}"><i class="fa-regular fa-heart"></i></a>
