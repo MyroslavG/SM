@@ -13,9 +13,9 @@
                 <div>
                     {{ post.likes|length }}
                     {% if current_user.id in post.likes|map(attribute="author")|list %}
-                        <a href="/like_post/{{ post.id }}"><i class="fa-solid fa-heart"></i></a>
+                        <a href="{{ url_for('posts.like_post', post_id=post.id) }}"><i class="fa-solid fa-heart"></i></a>
                     {% else %}
-                        <a href="/like_post/{{ post.id }}"><i class="fa-regular fa-heart"></i></a>
+                        <a href="{{ url_for('posts.like_post', post_id=post.id) }}"><i class="fa-regular fa-heart"></i></a>
                     {% endif %}
                 </div>
             </div>

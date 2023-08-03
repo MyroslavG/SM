@@ -1,10 +1,11 @@
 from flask import (render_template, url_for, flash,
-                   redirect, request, abort, Blueprint)
+                   redirect, request, abort, Blueprint, session)
 from flask_login import current_user, login_required
 from flaskblog import db
 from flaskblog.models import User, Post, Like#, Comment
 from flaskblog.posts.forms import PostForm
 import urllib.parse
+from sqlalchemy import func, desc
 
 posts = Blueprint('posts', __name__)
 
@@ -88,4 +89,12 @@ def profile_like_post(username, post_id):
         like = Like(author=current_user.id, post_id=post_id)    
         db.session.add(like)
         db.session.commit()
-    return redirect(url_for('users.profile', username=username))      
+    return redirect(url_for('users.profile', username=username))    
+
+@posts.route('/trending')
+def trending():
+    most_liked_posts = db.session.query(
+        Post, func.count(Like.id).label('like_count')
+    ).outerjoin(Like).group_by(Post).order_by(desc('like_count')).all()
+
+    return render_template('trending.html', posts=most_liked_posts)    
