@@ -6,6 +6,7 @@ from flaskblog.models import User, Post, Like#, Comment
 from flaskblog.posts.forms import PostForm
 import urllib.parse
 from sqlalchemy import func, desc
+from flaskblog.users.utils import save_picture
 
 posts = Blueprint('posts', __name__)
 
@@ -14,11 +15,14 @@ posts = Blueprint('posts', __name__)
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(title=form.title.data, content=form.content.data, author=current_user)
+        picture_file = None
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+        post = Post(title=form.title.data, content=form.content.data, author=current_user, picture=picture_file)
         db.session.add(post)
         db.session.commit()
         flash('YOUR POST HAS BEEN CREATED!', 'success')
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.home'))   
     return render_template('create_post.html', title = 'NEW POST', form=form, legend='NEW POST')
 
 @posts.route("/post/<int:post_id>", methods=['GET', 'POST'])  
