@@ -38,7 +38,7 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(100), nullable = False)
     date_posted = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
-    image_file = db.Column(db.String(20))
+    image_file = db.Column(db.String(200))
     content = db.Column(db.Text, nullable = False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     likes = db.relationship('Like', backref = 'post', lazy = True)
@@ -50,9 +50,9 @@ class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date_created = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
     author = db.Column(db.Integer, db.ForeignKey(
-            'user.id', ondelete="CASCADE"), nullable=False)
+            'user.id'), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey(
-            'post.id', ondelete="CASCADE"), nullable=False)
+            'post.id'), nullable=False)
 
     def __repr__(self):
         return f"Like('{self.date_created}', '{self.author}', '{self.post_id}')"

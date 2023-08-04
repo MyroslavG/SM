@@ -15,6 +15,9 @@
             </div>
             <h2 class="article-title">{{ post.title }}</h2>
             <p class="article-content">{{ post.content }}</p>
+            {% if post.image_file %}
+                <img class="post-image" src="https://cdn.britannica.com/14/4814-004-7C0DF1BB/Flag-Ukraine.jpg" alt="Post Image">
+            {% endif %}  
         </div>
     </article>    
     <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">

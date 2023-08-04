@@ -6,7 +6,7 @@ from flaskblog.models import User, Post, Like#, Comment
 from flaskblog.posts.forms import PostForm
 import urllib.parse
 from sqlalchemy import func, desc
-from flaskblog.users.utils import save_picture
+from flaskblog.users.utils import post_picture
 
 posts = Blueprint('posts', __name__)
 
@@ -17,12 +17,12 @@ def new_post():
     if form.validate_on_submit():
         picture_file = None
         if form.picture.data:
-            picture_file = save_picture(form.picture.data)
-        post = Post(title=form.title.data, content=form.content.data, author=current_user, picture=picture_file)
+            picture_file = "https://cdn.britannica.com/14/4814-004-7C0DF1BB/Flag-Ukraine.jpg"
+        post = Post(title=form.title.data, content=form.content.data, author=current_user, image_file=picture_file)
         db.session.add(post)
         db.session.commit()
         flash('YOUR POST HAS BEEN CREATED!', 'success')
-        return redirect(url_for('main.home'))   
+        return redirect(url_for('main.home'))      
     return render_template('create_post.html', title = 'NEW POST', form=form, legend='NEW POST')
 
 @posts.route("/post/<int:post_id>", methods=['GET', 'POST'])  
@@ -54,6 +54,9 @@ def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
     if post.author != current_user:
         abort(403)
+    likes_to_delete = db.session.query(Like).filter(Like.post_id == post_id).all()
+    for item in likes_to_delete:
+        db.session.delete(item)
     db.session.delete(post)
     db.session.commit()
     flash('YOUR POST HAS BEEN DELETED!', 'success')

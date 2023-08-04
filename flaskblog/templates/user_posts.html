@@ -11,6 +11,9 @@
                 </div>
                 <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
                 <p class="article-content">{{ post.content }}</p>
+                {% if post.image_file %}
+                    <img class="post-image" src="https://cdn.britannica.com/14/4814-004-7C0DF1BB/Flag-Ukraine.jpg" alt="Post Image">
+                {% endif %}  
             </div>
         </article>
     {% endfor %}     
