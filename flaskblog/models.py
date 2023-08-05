@@ -39,6 +39,7 @@ class Post(db.Model):
     title = db.Column(db.String(100), nullable = False)
     date_posted = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
     image_file = db.Column(db.String(200))
+    video_file = db.Column(db.String(200))
     content = db.Column(db.Text, nullable = False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     likes = db.relationship('Like', backref = 'post', lazy = True)

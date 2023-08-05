@@ -13,6 +13,11 @@
                 {% if post.image_file %}
                     <img class="post-image" src="https://cdn.britannica.com/14/4814-004-7C0DF1BB/Flag-Ukraine.jpg" alt="Post Image">
                 {% endif %}  
+
+                {% if post.video_file %}
+                    <!-- Use appropriate video player (e.g., HTML5 video player, YouTube embed) -->
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/tgbNymZ7vqY?playlist=tgbNymZ7vqY&loop=1" frameborder="0" allowfullscreen></iframe>
+                {% endif %}
                 <div>
                     {{ post.likes|length }}
                     {% if current_user.id in post.likes|map(attribute="author")|list %}
@@ -20,6 +25,7 @@
                     {% else %}
                         <a href="{{ url_for('posts.like_post', post_id=post.id) }}"><i class="fa-regular fa-heart"></i></a>
                     {% endif %}
+                    
                 </div>
             </div>
         </article>

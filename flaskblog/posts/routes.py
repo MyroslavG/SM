@@ -16,9 +16,11 @@ def new_post():
     form = PostForm()
     if form.validate_on_submit():
         picture_file = None
+        video_file = None
         if form.picture.data:
-            picture_file = "https://cdn.britannica.com/14/4814-004-7C0DF1BB/Flag-Ukraine.jpg"
-        post = Post(title=form.title.data, content=form.content.data, author=current_user, image_file=picture_file)
+            #picture_file = "https://cdn.britannica.com/14/4814-004-7C0DF1BB/Flag-Ukraine.jpg"
+            video_file = "https://www.youtube.com/watch?v=ZQvQkQP77g0&ab_channel=5%D0%BA%D0%B0%D0%BD%D0%B0%D0%BB"
+        post = Post(title=form.title.data, content=form.content.data, author=current_user, video_file=video_file)
         db.session.add(post)
         db.session.commit()
         flash('YOUR POST HAS BEEN CREATED!', 'success')
