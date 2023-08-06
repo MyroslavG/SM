@@ -15,8 +15,8 @@
                 {% endif %}  
 
                 {% if post.video_file %}
-                    <!-- Use appropriate video player (e.g., HTML5 video player, YouTube embed) -->
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/tgbNymZ7vqY?playlist=tgbNymZ7vqY&loop=1" frameborder="0" allowfullscreen></iframe>
+                    {% set video_id = post.video_file.split('v=')[1][:11] %}
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ video_id }}" frameborder="0" allowfullscreen></iframe>
                 {% endif %}
                 <div>
                     {{ post.likes|length }}
@@ -25,8 +25,30 @@
                     {% else %}
                         <a href="{{ url_for('posts.like_post', post_id=post.id) }}"><i class="fa-regular fa-heart"></i></a>
                     {% endif %}
-                    
                 </div>
+                <button class="collapsible-button" onclick="toggleCollapsibleContent()">COMMENTS</button>
+                <div class="collapsible-content" id="comments">
+                    {% for comment in post.comments %}
+                        <p>
+                            {% if comment.author %}
+                                {{ comment.author.username }}
+                            {% else %}
+                                Anonymous User
+                            {% endif %}
+                            : {{ comment.text }}
+                        </p>
+                    {% endfor %}
+                </div>
+                <script>
+                    function toggleCollapsibleContent() {
+                        var content = document.getElementById("comments");
+                        if (content.style.display === "none") {
+                            content.style.display = "block";
+                        } else {
+                            content.style.display = "none";
+                        }
+                    }
+                </script>
             </div>
         </article>
     {% endfor %}     

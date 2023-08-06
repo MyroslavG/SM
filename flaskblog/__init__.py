@@ -6,6 +6,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
 from dotenv import load_dotenv
+from flask_socketio import SocketIO
 
 app = Flask(__name__)
 load_dotenv()
@@ -28,13 +29,16 @@ app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS')
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 mail = Mail(app)
+socketio = SocketIO(app)
 
 from flaskblog.users.routes import users
 from flaskblog.posts.routes import posts
 from flaskblog.main.routes import main
 from flaskblog.errors.handlers import errors
+from flaskblog.messages.routes import socketio_bp
 
 app.register_blueprint(users)
 app.register_blueprint(posts)
 app.register_blueprint(main)
 app.register_blueprint(errors)
+app.register_blueprint(socketio_bp)

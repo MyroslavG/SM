@@ -29,17 +29,15 @@
                     </form>
                     <div class="collapse navbar-collapse" id="navbarToggle">
                         <div class="navbar-nav ml-auto">
-                            <a class="nav-item nav-link ml-0" href="{{ url_for('main.home') }}">HOME</a>
                         </div>
                     <!-- Navbar Right Side -->
                         <div class="navbar-nav">
                             {% if current_user.is_authenticated %}
+                                <a class="nav-item nav-link ml-0" href="{{ url_for('main.message') }}">MESSAGES</a>
                                 <a class="nav-item nav-link ml-0" href="{{ url_for('posts.new_post') }}">NEW POST</a>
                                 <a class="nav-item nav-link ml-0" href="{{ url_for('users.account') }}">PROFILE</a>
-                                <a class="nav-item nav-link ml-0" href="{{ url_for('main.about') }}">ABOUT</a>
                                 <a class="nav-item nav-link ml-0" href="{{ url_for('users.logout') }}">LOGOUT</a>
                             {% else %}
-                                <a class="nav-item nav-link ml-0" href="{{ url_for('main.about') }}">ABOUT</a>
                                 <a class="nav-item nav-link ml-0" href="{{ url_for('users.login') }}">LOGIN</a>
                                 <a class="nav-item nav-link ml-0" href="{{ url_for('users.register') }}">REGISTER</a>
                             {% endif %}

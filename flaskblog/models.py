@@ -43,6 +43,7 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable = False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     likes = db.relationship('Like', backref = 'post', lazy = True)
+    comments = db.relationship('Comment', backref = 'post', lazy = True)
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
@@ -63,6 +64,13 @@ class Comment(db.Model):
     text = db.Column(db.String(200), nullable = False)
     date_created = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
     author = db.Column(db.Integer, db.ForeignKey(
-            'user.id', ondelete="CASCADE"), nullable=False)
+            'user.id'), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey(
-            'post.id', ondelete="CASCADE"), nullable=False)        
+            'post.id'), nullable=False)    
+
+'''class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
+    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
+    message_content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)        '''    

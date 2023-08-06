@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">COMMENT THE POST BY {{ post.author.username }}</legend>
+            <div class="form-group">
+                {{ form.comment_text.label(class="form-control-label") }}
+
+                {% if form.comment_text.errors %}
+                    {{ form.comment_text(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.comment_text.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %} 
+                    {{ form.comment_text(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+        </fieldset>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+    </form>
+{% endblock content %}    

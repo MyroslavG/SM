@@ -16,3 +16,4 @@ mysql-connector-python
 email_validator
 pillow
 gunicorn
+flask-socketio

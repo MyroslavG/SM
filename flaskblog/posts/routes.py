@@ -2,8 +2,8 @@ from flask import (render_template, url_for, flash,
                    redirect, request, abort, Blueprint, session)
 from flask_login import current_user, login_required
 from flaskblog import db
-from flaskblog.models import User, Post, Like#, Comment
-from flaskblog.posts.forms import PostForm
+from flaskblog.models import User, Post, Like, Comment
+from flaskblog.posts.forms import PostForm, CommentForm
 import urllib.parse
 from sqlalchemy import func, desc
 from flaskblog.users.utils import post_picture
@@ -17,10 +17,11 @@ def new_post():
     if form.validate_on_submit():
         picture_file = None
         video_file = None
-        if form.picture.data:
-            #picture_file = "https://cdn.britannica.com/14/4814-004-7C0DF1BB/Flag-Ukraine.jpg"
-            video_file = "https://www.youtube.com/watch?v=ZQvQkQP77g0&ab_channel=5%D0%BA%D0%B0%D0%BD%D0%B0%D0%BB"
-        post = Post(title=form.title.data, content=form.content.data, author=current_user, video_file=video_file)
+        if form.media.data:
+            video_url = form.media.data
+        #if form.picture.data:
+
+        post = Post(title=form.title.data, content=form.content.data, author=current_user, video_file=video_url)
         db.session.add(post)
         db.session.commit()
         flash('YOUR POST HAS BEEN CREATED!', 'success')
@@ -99,6 +100,26 @@ def profile_like_post(username, post_id):
         db.session.add(like)
         db.session.commit()
     return redirect(url_for('users.profile', username=username))    
+
+@posts.route('/comment_post/<int:post_id>', methods=['GET', 'POST'])
+@login_required
+def comment_post(post_id):
+    post = Post.query.get(post_id)
+    if not post:
+        flash('POST DOES NOT EXIST', 'danger')
+    else:
+        form = CommentForm()
+        if form.validate_on_submit():
+            text = form.comment_text.data
+            new_comment = Comment(text=text, author=current_user.id, post_id=post_id)
+            db.session.add(new_comment)
+            db.session.commit()
+            flash('COMMENT ADDED', 'success')
+            return redirect(url_for('main.home'))
+        else:
+            flash('PLEASE ENTER A COMMENT', 'danger')
+
+    return render_template('comment.html', title='LOGIN', form=form, post=post) 
 
 @posts.route('/trending')
 def trending():
