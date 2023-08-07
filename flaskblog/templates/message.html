@@ -1,4 +1,17 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h1>MESSAGES</h1>
+
+    <h3>Comments on Your Posts:</h3>
+    <ul>
+        {% for comment in logged_in_user_comments %}
+            <li>{{ comment.text }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Likes on Your Posts:</h3>
+    <ul>
+        {% for like in logged_in_user_likes %}
+            <li>{{ like.post_id }}</li>
+        {% endfor %}
+    </ul>
 {% endblock content %}    

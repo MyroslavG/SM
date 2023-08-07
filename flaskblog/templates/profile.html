@@ -1,6 +1,21 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h1 style="text-transform:uppercase">{{ user.username }}</h1>
+    <article class="media content-section">
+        <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/' + user.image_file) }}">
+        <div class="media-body">
+            <h1 style="text-transform:uppercase">{{ user.username }}</h1>
+
+            <div>
+                {{ user.subscribers|length }}
+                {% if current_user.id in user.subscribers|map(attribute="author")|list %}
+                        <a href="{{ url_for('users.subscribe', username=user.username) }}"><i class="fa-solid fa-minus"></i></a>
+                    {% else %}
+                        <a href="{{ url_for('users.subscribe', username=user.username) }}"><i class="fa-solid fa-plus"></i></a>
+                {% endif %}
+            </div>
+        </div>
+    </article>
+    
     {% for post in posts.items %}
         <article class="media content-section">
             <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/' + post.author.image_file) }}">
@@ -14,6 +29,7 @@
                 {% if post.image_file %}
                     <img class="post-image" src="https://cdn.britannica.com/14/4814-004-7C0DF1BB/Flag-Ukraine.jpg" alt="Post Image">
                 {% endif %}  
+                
                 <div>
                     {{ post.likes|length }}
                     {% if current_user.id in post.likes|map(attribute="author")|list %}

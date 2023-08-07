@@ -7,6 +7,14 @@ from flask_login import UserMixin
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+class Subscription(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    date_created = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
+    subscriber_id = db.Column(db.Integer, db.ForeignKey(
+            'user.id'), nullable=False)
+    subscribed_to_id = db.Column(db.Integer, db.ForeignKey(
+            'user.id'), nullable=False)    
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(20), unique = True, nullable = False)
@@ -17,6 +25,12 @@ class User(db.Model, UserMixin):
     date_registered = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
     likes = db.relationship('Like', backref = 'user', lazy = True)
     comments = db.relationship('Comment', backref = 'user', lazy = True)
+    subscribers = db.relationship('Subscription', foreign_keys=[Subscription.subscribed_to_id], backref=db.backref('subscriber'))
+    subscribed_to = db.relationship('Subscription', foreign_keys=[Subscription.subscriber_id], backref=db.backref('subscribed_to'))
+
+    @property
+    def num_subscribers(self):
+        return self.subscribers.count('subscribers')
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)
@@ -67,6 +81,7 @@ class Comment(db.Model):
             'user.id'), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey(
             'post.id'), nullable=False)    
+
 
 '''class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)

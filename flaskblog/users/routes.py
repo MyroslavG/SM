@@ -1,10 +1,11 @@
 from flask import render_template, url_for, flash, redirect, request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
 from flaskblog import db, bcrypt
-from flaskblog.models import User, Post#, Comment
+from flaskblog.models import User, Post, Subscription, Comment, Like
 from flaskblog.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                    RequestResetForm, ResetPasswordForm)
 from flaskblog.users.utils import save_picture, send_reset_email
+from flask_wtf.csrf import generate_csrf
 
 users = Blueprint('users', __name__)
 
@@ -101,11 +102,42 @@ def reset_token(token):
         return redirect(url_for('users.login'))
     return render_template('reset_token.html', title='RESET PASSWORD', form=form)    
 
-@users.route('/profile/<string:username>')
+@users.route('/profile/<string:username>', methods=['GET', 'POST'])
 def profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     page = request.args.get('page', 1, type=int)
     posts = Post.query.filter_by(author=user)\
         .order_by(Post.date_posted.desc())\
-        .paginate(page=page, per_page=5)
-    return render_template('profile.html', user=user, posts=posts)    
+        .paginate(page=page, per_page=5) 
+
+    return render_template('profile.html', user=user, posts=posts)
+
+@users.route('/subscribe/<string:username>', methods=['GET', 'POST'])
+@login_required
+def subscribe(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    subscription = Subscription.query.filter_by(subscriber_id=current_user.id, subscribed_to_id=user.id).first()
+
+    if subscription:
+        db.session.delete(subscription)
+        db.session.commit()
+    else:
+        new_subscription = Subscription(subscriber_id=current_user.id, subscribed_to_id=user.id)
+        db.session.add(new_subscription)
+        db.session.commit()
+
+    return redirect(url_for('users.profile', username=username))  
+
+@users.route('/message', methods=['GET'])
+def message():
+    user = User.query.filter_by(username=current_user.username).first_or_404()
+
+    # Fetch subscribers, comments, and likes specific to the logged-in user
+    #logged_in_user_subscribers = user.subscribers.filter_by(subscriber_id=current_user.id).all()
+    logged_in_user_comments = Comment.query.filter_by(author=current_user.id).all()
+    logged_in_user_likes = Like.query.filter_by(author=current_user.id).all()
+
+    return render_template('message.html', user=user,
+                           logged_in_user_comments=logged_in_user_comments, logged_in_user_likes=logged_in_user_likes)    
+
+    
