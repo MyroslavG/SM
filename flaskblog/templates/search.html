@@ -22,4 +22,16 @@
             {{ form.submit(class="btn btn-outline-info") }}
         </div>
     </form>
+
+    {% if search_results %}
+        <h2>FOUND:</h2>
+        <ul>
+            {% for user in search_results %}
+                <a class="mr-2" href="{{ url_for('users.profile', username=user.username) }}">{{ user.username }}</a>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No matching usernames found.</p>
+    {% endif %}
+
 {% endblock content %}    

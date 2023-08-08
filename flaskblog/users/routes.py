@@ -152,11 +152,15 @@ def base():
 @users.route('/search', methods=['GET', 'POST'])
 def search():           
     form = SearchForm()
+    search_results = []
+
     if request.method == 'POST':
         if form.validate_on_submit():
             searched = form.searched.data
-
-
+            search_results = User.query.filter(
+                User.username.ilike(f'%{searched}%'),
+            ).all()
+            return render_template('search.html', form=form, search_results=search_results)    
         else:    
             pass
-    return render_template('search.html', form=form, results=results, error=error)
+    return render_template('search.html', form=form)
