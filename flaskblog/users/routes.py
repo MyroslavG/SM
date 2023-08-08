@@ -156,14 +156,7 @@ def search():
         if form.validate_on_submit():
             searched = form.searched.data
 
-            return render_template('search.html', form=form, searched = searched)
 
         else:    
-    return render_template('search.html', form=form, results=results)
-
-@users.route('/search/<string:quote>', methods=['GET', 'POST'])
-def search_quote():           
-    form = SearchForm()
-    
-    else:
-        return redirect(url_for('main.home'))
+            pass
+    return render_template('search.html', form=form, results=results, error=error)
