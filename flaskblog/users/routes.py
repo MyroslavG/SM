@@ -152,12 +152,18 @@ def base():
 @users.route('/search', methods=['GET', 'POST'])
 def search():           
     form = SearchForm()
-    if form.validate_on_submit():
-        searched = form.searched.data
-        return render_template('search.html', form=form, searched = searched)
-    else:
-        return redirect(url_for('main.home'))
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            searched = form.searched.data
+
+            return render_template('search.html', form=form, searched = searched)
+
+        else:    
+    return render_template('search.html', form=form, results=results)
 
 @users.route('/search/<string:quote>', methods=['GET', 'POST'])
 def search_quote():           
-    pass
+    form = SearchForm()
+    
+    else:
+        return redirect(url_for('main.home'))
