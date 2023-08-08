@@ -7,7 +7,7 @@
                 <h2 class="account-heading">{{ current_user.username }}</h2>
                 <p class="text-secondary">{{ current_user.email }}</p>
             </div>
-            <p>You have {{ current_user.num_subscribers }} subscribers</p>
+            <p>You have {{ current_user.subscribers|length }} subscribers</p>
         </div>
             <form method="POST" action="" enctype="multipart/form-data">
                 {{ form.hidden_tag() }}

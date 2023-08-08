@@ -25,14 +25,14 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarToggle">
                         <div class="navbar-nav ml-auto">
-                            <a class="nav-item nav-link ml-0" href="{{ url_for('users.search') }}">SEARCH</a>
+                            <a class="nav-item nav-link ml-2" href="{{ url_for('users.search') }}"><i class="fas fa-search"></i></a>
                         </div>
                     <!-- Navbar Right Side -->
                         <div class="navbar-nav">
                             {% if current_user.is_authenticated %}
-                                <a class="nav-item nav-link ml-0" href="{{ url_for('main.message') }}">MESSAGE</a>
-                                <a class="nav-item nav-link ml-0" href="{{ url_for('posts.new_post') }}">NEW POST</a>
-                                <a class="nav-item nav-link ml-0" href="{{ url_for('users.account') }}">PROFILE</a>
+                                <a class="nav-item nav-link ml-2" href="{{ url_for('posts.new_post') }}"><i class="fas fa-plus"></i></a>
+                                <a class="nav-item nav-link ml-2" href="{{ url_for('main.message') }}"><i class="fas fa-envelope"></i></a>
+                                <a class="nav-item nav-link ml-2" href="{{ url_for('users.account') }}"><i class="fas fa-user"></i></a>
                                 <a class="nav-item nav-link ml-0" href="{{ url_for('users.logout') }}">LOGOUT</a>
                             {% else %}
                                 <a class="nav-item nav-link ml-0" href="{{ url_for('users.login') }}">LOGIN</a>

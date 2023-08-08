@@ -136,8 +136,7 @@ def notification():
     logged_in_user_subscriptions = Subscription.query.join(User, and_(
             Subscription.subscriber_id == current_user.id,
             Subscription.subscribed_to_id == User.id
-            )).all()
-    print(logged_in_user_subscriptions)        
+            )).all()       
     logged_in_user_comments = Comment.query.join(Post).filter(Post.author == current_user).all()
     logged_in_user_likes = Like.query.join(Post).filter(Post.author == current_user).all()
 
