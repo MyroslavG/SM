@@ -127,9 +127,9 @@ def subscribe(username):
         db.session.commit()
 
     return redirect(url_for('users.profile', username=username))  
-
-@users.route('/message', methods=['GET'])
-def message():
+    
+@users.route('/message/notification', methods=['GET'])
+def notification():
     user = User.query.filter_by(username=current_user.username).first_or_404()
 
     # Fetch subscribers, comments, and likes specific to the logged-in user
@@ -137,17 +137,27 @@ def message():
     logged_in_user_comments = Comment.query.filter_by(author=current_user.id).all()
     logged_in_user_likes = Like.query.filter_by(user=current_user).all()
 
-    return render_template('message.html', user=user,
+    return render_template('notification.html', user=user,
                            logged_in_user_comments=logged_in_user_comments, logged_in_user_likes=logged_in_user_likes)
+
+@users.route('/message/chat', methods=['GET'])
+def chat():
+    return render_template('chat.html')                           
 
 @users.context_processor
 def base():
     form = SearchForm()
     return dict(form=form)
 
-@users.route('/search', methods=['POST'])
-def search():       
+@users.route('/search', methods=['GET', 'POST'])
+def search():           
     form = SearchForm()
     if form.validate_on_submit():
-        post.searched = form.searched.data
-        return render_template("search.html", form=form, searched = post.searched)
+        searched = form.searched.data
+        return render_template('search.html', form=form, searched = searched)
+    else:
+        return redirect(url_for('main.home'))
+
+@users.route('/search/<string:quote>', methods=['GET', 'POST'])
+def search_quote():           
+    pass

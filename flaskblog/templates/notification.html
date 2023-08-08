@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h3>Comments on Your Posts:</h3>
+    <ul>
+        {% for comment in logged_in_user_comments %}
+            <li>{{ comment.text }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Likes on Your Posts:</h3>
+    <ul>
+        {% for like in logged_in_user_likes %}
+            <li>{{ like.user.username }}</li>
+        {% endfor %}
+    </ul>
+{% endblock content %} 
