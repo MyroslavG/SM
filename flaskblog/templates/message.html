@@ -11,7 +11,7 @@
     <h3>Likes on Your Posts:</h3>
     <ul>
         {% for like in logged_in_user_likes %}
-            <li>{{ like.post_id }}</li>
+            <li>{{ like.user.username }}</li>
         {% endfor %}
     </ul>
 {% endblock content %}    

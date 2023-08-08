@@ -3,7 +3,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 from flaskblog import db, bcrypt
 from flaskblog.models import User, Post, Subscription, Comment, Like
 from flaskblog.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
-                                   RequestResetForm, ResetPasswordForm)
+                                   RequestResetForm, ResetPasswordForm, SearchForm)
 from flaskblog.users.utils import save_picture, send_reset_email
 from flask_wtf.csrf import generate_csrf
 
@@ -135,9 +135,19 @@ def message():
     # Fetch subscribers, comments, and likes specific to the logged-in user
     #logged_in_user_subscribers = user.subscribers.filter_by(subscriber_id=current_user.id).all()
     logged_in_user_comments = Comment.query.filter_by(author=current_user.id).all()
-    logged_in_user_likes = Like.query.filter_by(author=current_user.id).all()
+    logged_in_user_likes = Like.query.filter_by(user=current_user).all()
 
     return render_template('message.html', user=user,
-                           logged_in_user_comments=logged_in_user_comments, logged_in_user_likes=logged_in_user_likes)    
+                           logged_in_user_comments=logged_in_user_comments, logged_in_user_likes=logged_in_user_likes)
 
-    
+@users.context_processor
+def base():
+    form = SearchForm()
+    return dict(form=form)
+
+@users.route('/search', methods=['POST'])
+def search():       
+    form = SearchForm()
+    if form.validate_on_submit():
+        post.searched = form.searched.data
+        return render_template("search.html", form=form, searched = post.searched)
