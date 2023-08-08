@@ -1,16 +1,34 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h3>Comments on Your Posts:</h3>
+    <h3>LIKES</h3>
     <ul>
-        {% for comment in logged_in_user_comments %}
-            <li>{{ comment.text }}</li>
+        {% for post in logged_in_user_likes %}
+            <li>
+                <strong>{{ post.post.title }}</strong> liked by {{ post.user.username }}
+            </li>
         {% endfor %}
     </ul>
 
-    <h3>Likes on Your Posts:</h3>
+    <h3>COMMENTS</h3>
     <ul>
-        {% for like in logged_in_user_likes %}
-            <li>{{ like.user.username }}</li>
+        {% for post in logged_in_user_comments %}
+            <li>
+                <strong>{{ post.post.title }}</strong>
+                <ul>
+                    {% for comment in post.post.comments %}
+                        {{ comment.text }} by {{ comment.user.username }}
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h3>SUBSCRIPTIONS</h3>  
+    <ul>
+        {% for user in logged_in_user_subscriptions %}
+            <li>
+                <strong>{{ user.subscriber.username }}</strong> subscribed to you
+            </li>
         {% endfor %}
     </ul>
 {% endblock content %} 

@@ -6,6 +6,7 @@ from flaskblog.users.forms import (RegistrationForm, LoginForm, UpdateAccountFor
                                    RequestResetForm, ResetPasswordForm, SearchForm)
 from flaskblog.users.utils import save_picture, send_reset_email
 from flask_wtf.csrf import generate_csrf
+from sqlalchemy import and_
 
 users = Blueprint('users', __name__)
 
@@ -132,12 +133,15 @@ def subscribe(username):
 def notification():
     user = User.query.filter_by(username=current_user.username).first_or_404()
 
-    # Fetch subscribers, comments, and likes specific to the logged-in user
-    #logged_in_user_subscribers = user.subscribers.filter_by(subscriber_id=current_user.id).all()
-    logged_in_user_comments = Comment.query.filter_by(author=current_user.id).all()
-    logged_in_user_likes = Like.query.filter_by(user=current_user).all()
+    logged_in_user_subscriptions = Subscription.query.join(User, and_(
+            Subscription.subscriber_id == current_user.id,
+            Subscription.subscribed_to_id == User.id
+            )).all()
+    print(logged_in_user_subscriptions)        
+    logged_in_user_comments = Comment.query.join(Post).filter(Post.author == current_user).all()
+    logged_in_user_likes = Like.query.join(Post).filter(Post.author == current_user).all()
 
-    return render_template('notification.html', user=user,
+    return render_template('notification.html', user=user, logged_in_user_subscriptions=logged_in_user_subscriptions,
                            logged_in_user_comments=logged_in_user_comments, logged_in_user_likes=logged_in_user_likes)
 
 @users.route('/message/chat', methods=['GET'])
