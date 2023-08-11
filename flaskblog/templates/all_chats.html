@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h2>CHATS</h2>
+    <ul>
+        {% for user in all_recipients %}
+            <li><a href="{{ url_for('chats.chat_with_user', recipient_id=user.id) }}" class="chat-link">{{ user.username }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock content %}    

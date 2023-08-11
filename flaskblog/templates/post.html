@@ -4,14 +4,28 @@
         <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/' + post.author.image_file) }}">
         <div class="media-body">
             <div class="article-metadata">
-                <a class="mr-2" href="#">{{ post.author.username }}</a>
+              {% if post.author != current_user %}
+                <a class="mr-2" href="{{ url_for('users.profile', username=post.author.username) }}">{{ post.author.username }}</a>
+              {% else %}
+                <a class="mr-2" href="{{ url_for('users.account', username=post.author.username) }}">{{ post.author.username }}</a>
+              {% endif %}
                 <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
                 {% if post.author == current_user %}
                     <div>
                         <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('posts.update_post', post_id=post.id) }}">UPDATE</a>
                         <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">DELETE</button>
                     </div>
-                {% endif %}    
+                {% endif %} 
+              <div>
+                <p>{{ post.author.subscribers|length }}</p>
+                  {% if current_user.username != post.author.username %}
+                      {% if current_user.id in post.author.subscribers|map(attribute="author")|list %}
+                              <a href="{{ url_for('users.subscribe', username=post.author.username) }}"><i class="fa-solid fa-minus"></i></a>
+                          {% else %}
+                              <a href="{{ url_for('users.subscribe', username=post.author.username) }}"><i class="fa-solid fa-plus"></i></a>
+                      {% endif %}
+                  {% endif %}    
+              </div>     
             </div>
             <h2 class="article-title">{{ post.title }}</h2>
             <p class="article-content">{{ post.content }}</p>

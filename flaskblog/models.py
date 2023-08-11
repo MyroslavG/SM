@@ -27,6 +27,8 @@ class User(db.Model, UserMixin):
     comments = db.relationship('Comment', backref = 'user', lazy = True)
     subscribers = db.relationship('Subscription', foreign_keys=[Subscription.subscribed_to_id], backref=db.backref('subscriber'))
     subscribed_to = db.relationship('Subscription', foreign_keys=[Subscription.subscriber_id], backref=db.backref('subscribed_to'))
+    sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender')
+    received_messages = db.relationship('Message', foreign_keys='Message.recipient_id', backref='recipient')
 
     @property
     def num_subscribers(self):
@@ -52,12 +54,14 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(100), nullable = False)
     date_posted = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
-    image_file = db.Column(db.String(200))
+    picture_file = db.Column(db.String(200))
     video_file = db.Column(db.String(200))
     content = db.Column(db.Text, nullable = False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     likes = db.relationship('Like', backref = 'post', lazy = True)
     comments = db.relationship('Comment', backref = 'post', lazy = True)
+    media_id = db.Column(db.Integer, db.ForeignKey('file.id'))
+    media = db.relationship('File', backref='post_media', uselist=False)
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
@@ -82,9 +86,32 @@ class Comment(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey(
             'post.id'), nullable=False)    
 
+chat_participants = db.Table(
+    'chat_participants',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('chat_id', db.Integer, db.ForeignKey('chat.id'))
+)
+
+class Chat(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    participants = db.relationship('User', secondary=chat_participants, backref='chats')
+    messages = db.relationship('Message', backref='chat', lazy=True)
+
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
-    receiver_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
+    chat_id = db.Column(db.Integer, db.ForeignKey('chat.id'), nullable=False)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     message_content = db.Column(db.Text, nullable=False)
-    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)        
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def is_sent_by_user(self, user):
+        return self.sender_id == user.id
+
+class File(db.Model):
+    id = db.Column(db.Integer, primary_key=True)    
+    original_filename = db.Column(db.String(100))
+    filename = db.Column(db.String(100))
+    bucket = db.Column(db.String(100))
+    region = db.Column(db.String(100))
+     

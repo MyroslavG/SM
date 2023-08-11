@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
-
-    <a href="{{ url_for('users.chat') }}">CHATS</a>
-    <a href="{{ url_for('users.notification') }}">NOTIFICATIONS</a>
-
+    <div class="navigation">
+        <a href="{{ url_for('chats.all_chats') }}">CHATS</a>
+        <a href="{{ url_for('users.notification') }}">NOTIFICATIONS</a>
+    </div>
 {% endblock content %}    

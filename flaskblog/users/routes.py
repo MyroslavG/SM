@@ -1,7 +1,7 @@
 from flask import render_template, url_for, flash, redirect, request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
 from flaskblog import db, bcrypt
-from flaskblog.models import User, Post, Subscription, Comment, Like
+from flaskblog.models import User, Post, Subscription, Comment, Like, Chat, Message
 from flaskblog.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
                                    RequestResetForm, ResetPasswordForm, SearchForm)
 from flaskblog.users.utils import save_picture, send_reset_email
@@ -141,11 +141,7 @@ def notification():
     logged_in_user_likes = Like.query.join(Post).filter(Post.author == current_user).all()
 
     return render_template('notification.html', user=user, logged_in_user_subscriptions=logged_in_user_subscriptions,
-                           logged_in_user_comments=logged_in_user_comments, logged_in_user_likes=logged_in_user_likes)
-
-@users.route('/message/chat', methods=['GET'])
-def chat():
-    return render_template('chat.html')                           
+                           logged_in_user_comments=logged_in_user_comments, logged_in_user_likes=logged_in_user_likes)                           
 
 @users.context_processor
 def base():
@@ -167,3 +163,5 @@ def search():
         else:    
             pass
     return render_template('search.html', form=form)
+
+    

@@ -6,12 +6,21 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
 from dotenv import load_dotenv
-from flask_socketio import SocketIO
+from flaskblog.posts.s3_utils import upload_to_s3
+#from flask_socketio import SocketIO
 
 app = Flask(__name__)
 load_dotenv()
 
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+
+S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
+AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
+AWS_SECRET_KEY = os.getenv('AWS_SECRET_KEY')
+#s3 = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
+UPLOAD_FOLDER = 'uploads'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 DB_USERNAME = os.getenv('DB_USERNAME')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 DB_HOST = os.getenv('DB_HOST')
@@ -29,16 +38,21 @@ app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS')
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 mail = Mail(app)
-socketio = SocketIO(app)
+#socketio = SocketIO(app)
 
 from flaskblog.users.routes import users
 from flaskblog.posts.routes import posts
 from flaskblog.main.routes import main
 from flaskblog.errors.handlers import errors
-#from flaskblog.messages.routes import socketio_bp
+from flaskblog.messages.routes import chats
 
 app.register_blueprint(users)
 app.register_blueprint(posts)
 app.register_blueprint(main)
 app.register_blueprint(errors)
-#app.register_blueprint(socketio_bp)
+app.register_blueprint(chats)
+
+#from flaskblog.messages.routes import socketio_bp
+
+# Register the socketio_bp blueprint with the SocketIO instance
+#socketio.register_blueprint(socketio_bp)

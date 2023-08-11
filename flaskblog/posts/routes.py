@@ -2,11 +2,17 @@ from flask import (render_template, url_for, flash,
                    redirect, request, abort, Blueprint, session)
 from flask_login import current_user, login_required
 from flaskblog import db
-from flaskblog.models import User, Post, Like, Comment
+from flaskblog.models import User, Post, Like, Comment, File
 from flaskblog.posts.forms import PostForm, CommentForm
 import urllib.parse
 from sqlalchemy import func, desc
-from flaskblog.users.utils import post_picture
+from werkzeug.utils import secure_filename
+from flaskblog.posts.s3_utils import upload_to_s3, allowed_file
+from werkzeug.datastructures import FileStorage
+import os
+import boto3
+import uuid
+from flask import app
 
 posts = Blueprint('posts', __name__)
 
@@ -17,21 +23,38 @@ def new_post():
     if form.validate_on_submit():
         picture_file = None
         video_file = None
-        if form.media.data:
-            video_url = form.media.data
-        #if form.picture.data:
 
-        post = Post(title=form.title.data, content=form.content.data, author=current_user, video_file=video_url)
+        if form.media.data:  # Check if a media file is uploaded
+            uploaded_file = form.media.data
+            if not allowed_file(uploaded_file):
+                flash('File type not allowed.', 'danger')
+                return redirect(request.url)
+
+            new_filename = uuid.uuid4().hex + '.' + uploaded_file.rsplit('.', 1)[1].lower()
+
+            s3 = boto3.resource("s3")
+            bucket = s3.Bucket(name=os.getenv('S3_BUCKET_NAME'))
+            bucket.upload_fileobj(uploaded_file, new_filename)
+
+            file = File(original_filename=uploaded_file.filename, filename=new_filename,
+                        bucket=bucket, region="us-east-2")
+
+            db.session.add(file)
+            db.session.commit()
+
+        post = Post(title=form.title.data, content=form.content.data, author=current_user,
+                    picture_file=picture_file, video_file=video_file)
         db.session.add(post)
         db.session.commit()
-        flash('YOUR POST HAS BEEN CREATED!', 'success')
-        return redirect(url_for('main.home'))      
-    return render_template('create_post.html', title = 'NEW POST', form=form, legend='NEW POST')
+        flash('Your post has been created!', 'success')
+        return redirect(url_for('main.home'))
+
+    return render_template('create_post.html', title='New Post', form=form, legend='New Post')
 
 @posts.route("/post/<int:post_id>", methods=['GET', 'POST'])  
 def post(post_id):
     post = Post.query.get_or_404(post_id)
-    return render_template('post.html', title=post.title, post=post, legend='NEW POST')
+    return render_template('post.html', title=post.title, post=post, legend='NEW POST')    
 
 @posts.route("/post/<int:post_id>/update", methods=['GET', 'POST'])  
 @login_required

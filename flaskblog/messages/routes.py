@@ -2,39 +2,59 @@ from flask import (render_template, url_for, flash,
                    redirect, request, abort, Blueprint, session)
 from flask_login import current_user, login_required
 from flaskblog import db
-from flaskblog.models import User, Post, Like#, Message
+from flaskblog.models import User, Post, Like, Message, Chat
 from flaskblog.posts.forms import PostForm
-import urllib.parse
 from sqlalchemy import func, desc
 from flaskblog.users.utils import post_picture
-from flask_socketio import SocketIO, emit
+import os
+from werkzeug.utils import secure_filename  
+import boto3
+from datetime import datetime
+#from flask_socketio import SocketIO, emit, join_room
+#from flaskblog import socketio
 
-socketio_bp = Blueprint('socketio', __name__, url_prefix='/socketio')
+chats = Blueprint('chats', __name__, url_prefix='/chat')
 
-@socketio_bp.route('connect')
-def handle_connect():
-    # Code to handle new WebSocket connections
-    print(f"New client connected: {request.sid}")
+@chats.route('/all_chats')
+def all_chats():
+    other_users = User.query.filter(User.id != current_user.id).all()
+    return render_template('all_chats.html', all_recipients=other_users)
 
-@socketio_bp.route('disconnect')
-def handle_disconnect():
-    # Code to handle WebSocket disconnections
-    print(f"Client disconnected: {request.sid}")
+@chats.route('/create/<int:recipient_id>')
+def chat_with_user(recipient_id):
+    chat = Chat.query.filter(
+        Chat.participants.any(id=current_user.id),
+        Chat.participants.any(id=recipient_id)
+    ).first()
 
-@socketio_bp.route('message')
-def handle_message(data):
-    # Code to handle incoming messages
-    sender_id = data.get('sender_id')
-    receiver_id = data.get('receiver_id')
-    message_content = data.get('message_content')
+    if chat is None:
+        new_chat = Chat()
+        new_chat.participants.append(current_user)
+        new_chat.participants.append(User.query.get(recipient_id))
+        db.session.add(new_chat)
+        db.session.commit()
+        chat = new_chat
 
-    # Save the message to the database (use your Message model for this)
-    new_message = Message(sender_id=sender_id, receiver_id=receiver_id, message_content=message_content)
+    if request.method == 'POST':
+        message_content = request.form.get('message_content')
+        new_message = Message(sender=current_user, recipient=User.query.get(recipient_id), chat=chat, message_content=message_content)
+        db.session.add(new_message)
+        db.session.commit()
+
+    messages = Message.query.filter_by(chat=chat).order_by(Message.timestamp.asc()).all()
+
+    return render_template('chat.html', chat=chat, messages=messages)
+
+@chats.route('/<int:chat_id>/send', methods=['POST'])
+def send_message(chat_id):
+    message_content = request.form.get('message_content')
+    
+    chat = Chat.query.get_or_404(chat_id)
+
+    recipient = chat.participants[0] if current_user.id == chat.participants[1].id else chat.participants[1]
+
+    new_message = Message(sender=current_user, recipient=recipient, chat=chat, message_content=message_content, timestamp=datetime.utcnow())
     db.session.add(new_message)
     db.session.commit()
 
-    # Broadcast the message to the recipient's WebSocket connection
-    socketio.emit('message', data, room=f"user_{receiver_id}")
-
-    # Send an acknowledgement to the sender
-    socketio.emit('message_ack', {'status': 'Message sent successfully'}, room=request.sid)
+    return redirect(url_for('chats.chat_with_user', chat_id=chat_id, recipient_id=recipient.id))

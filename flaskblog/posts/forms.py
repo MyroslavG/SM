@@ -6,7 +6,7 @@ from flask_wtf.file import FileAllowed
 class PostForm(FlaskForm):
     title = StringField('TITLE', validators=[DataRequired()])                  
     content = TextAreaField('CONTENT', validators=[DataRequired()])
-    media = TextAreaField('MEDIA')#, validators=[FileAllowed(['jpg', 'png'])])
+    media = FileField('MEDIA')
     submit = SubmitField('POST')
 
 class CommentForm(FlaskForm):
