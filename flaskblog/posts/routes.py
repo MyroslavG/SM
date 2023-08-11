@@ -13,6 +13,7 @@ import os
 import boto3
 import uuid
 from flask import app
+import jsonify
 
 posts = Blueprint('posts', __name__)
 
@@ -88,7 +89,19 @@ def delete_post(post_id):
     flash('YOUR POST HAS BEEN DELETED!', 'success')
     return redirect(url_for('main.home'))
 
-@posts.route('/like_post/<int:post_id>', methods=['GET'])
+@posts.route('/post/<int:post_id>/like', methods=['POST'])
+@login_required
+def like_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    if request.method == 'POST':
+        if request.form.get('action') == 'increment':
+            post.likes += 1
+        elif request.form.get('action') == 'decrement':
+            post.likes -= 1
+        db.session.commit()
+        return jsonify({'likes': post.likes})    
+
+'''@posts.route('/like_post/<int:post_id>', methods=['GET'])
 @login_required
 def like_post(post_id):
     post = Post.query.filter_by(id=post_id)
@@ -122,7 +135,7 @@ def profile_like_post(username, post_id):
         like = Like(author=current_user.id, post_id=post_id)    
         db.session.add(like)
         db.session.commit()
-    return redirect(url_for('users.profile', username=username))    
+    return redirect(url_for('users.profile', username=username))   ''' 
 
 @posts.route('/comment_post/<int:post_id>', methods=['GET', 'POST'])
 @login_required

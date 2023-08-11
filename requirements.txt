@@ -18,3 +18,4 @@ pillow
 gunicorn
 flask-socketio
 boto3
+jsonify
