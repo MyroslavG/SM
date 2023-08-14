@@ -3,8 +3,8 @@ import uuid
 from flask import app, current_app
 
 def upload_to_s3(uploaded_file, file_name):
-    s3 = boto3.client('s3', aws_access_key_id='AKIAULWVFKKC4GADWK53',
-                      aws_secret_access_key='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')
+    s3 = boto3.client('s3', aws_access_key_id='',
+                      aws_secret_access_key='')
 
     #current_app.config['AWS_ACCESS_KEY']                  
     #current_app.config['AWS_SECRET_KEY']
