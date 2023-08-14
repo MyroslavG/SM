@@ -6,7 +6,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_migrate import Migrate
 from dotenv import load_dotenv
-from flaskblog.posts.s3_utils import upload_to_s3
+#from flaskblog.posts.s3_utils import upload_to_s3
 #from flask_socketio import SocketIO
 
 app = Flask(__name__)
@@ -18,8 +18,7 @@ S3_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_KEY')
 #s3 = boto3.client('s3', aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
-UPLOAD_FOLDER = 'uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER')
 
 DB_USERNAME = os.getenv('DB_USERNAME')
 DB_PASSWORD = os.getenv('DB_PASSWORD')

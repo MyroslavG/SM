@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 {% block content %}
     {% for post in posts.items %}
-        <article class="media content-section">
+        <article class="media content-section glass">
             <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/' + post.author.image_file) }}">
             <div class="media-body">
                 <div class="article-metadata">
-                    <a class="mr-2" href="{{ url_for('users.profile', username=post.author.username) }}">{{ post.author.username }}</a>
-                    <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+                    <a class="mr-2" href="{{ url_for('users.profile', username=post.author.username) }}" style="color: rgb(195, 19, 19);">{{ post.author.username }}</a>
+                    <small class="text-muted" style="color: white;">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
                 </div>
                 <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
                 <p class="article-content">{{ post.content }}</p>
@@ -19,36 +19,45 @@
 
                     <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ video_id }}" frameborder="0" allowfullscreen></iframe>
                 {% endif %}
-                <div>
-                    <!--
-                    {{ post.likes|length }}
-                    {% if current_user.id in post.likes|map(attribute="author")|list %}
-                        <a href="{{ url_for('posts.like_post', post_id=post.id) }}"><i class="fa-solid fa-heart"></i></a>
-                    {% else %}
-                        <a href="{{ url_for('posts.like_post', post_id=post.id) }}"><i class="fa-regular fa-heart"></i></a>
-                    {% endif %}
-                    -->
-
-                    <button onclick="updateLikeCount('increment', {{ post.id }})">Like</button>
-                    <button onclick="updateLikeCount('decrement', {{ post.id }})">Dislike</button>
-                    <p>Likes: <span id="like-count-{{ post.id }}">{{ post.likes }}</span></p>
-                </div>
                 <script>
                     function updateLikeCount(action, post_id) {
                         jQuery.ajax({
                             type: 'POST',
-                            url: '/post/${post_id}/like',
+                            url: '/post/' + post_id + '/like',
                             data: {'action': action},
                             success: function(response) {
                                 jQuery('#like-count-' + post_id).text(response.likes);
+                                toggleLikeButtons(post_id, action);
                             },
                             error: function(error) {
                                 console.error(error);
                             }
                         });
                     }
-                </script>
-                <button class="collapsible-button" onclick="toggleCollapsibleContent(post.id)">COMMENTS</button>
+                    
+                    function toggleLikeButtons(post_id, action) {
+                        var likeButton = document.getElementById('like-button-' + post_id);
+                        var dislikeButton = document.getElementById('dislike-button-' + post_id);
+                    
+                        if (action === 'increment') {
+                            likeButton.disabled = true;
+                            dislikeButton.disabled = false;
+                        } else if (action === 'decrement') {
+                            likeButton.disabled = false;
+                            dislikeButton.disabled = true;
+                        }
+                    }
+                    </script>
+                <div>
+                    <button id="like-button-{{ post.id }}" onclick="updateLikeCount('increment', {{ post.id }})" {% if current_user.id in post.likes|map(attribute="author")|list %} disabled {% endif %}>
+                        Like
+                    </button>
+                    <button id="dislike-button-{{ post.id }}" onclick="updateLikeCount('decrement', {{ post.id }})" {% if current_user.id not in post.likes|map(attribute="author")|list %} disabled {% endif %}>
+                        Dislike
+                    </button> 
+                </div>
+                
+                <button class="collapsible-button" onclick="toggleCollapsibleContent, {{ post.id }}">COMMENTS</button>
                 <div class="collapsible-content" id="comments-{{ post.id }}">
                     {% for comment in post.comments %}
                         <p>

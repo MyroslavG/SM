@@ -1,15 +1,15 @@
 {% extends "layout.html" %}
 {% block content %}
-    <article class="media content-section">
+    <article class="media content-section glass">
         <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/' + post.author.image_file) }}">
         <div class="media-body">
             <div class="article-metadata">
               {% if post.author != current_user %}
-                <a class="mr-2" href="{{ url_for('users.profile', username=post.author.username) }}">{{ post.author.username }}</a>
+                <a class="mr-2" href="{{ url_for('users.profile', username=post.author.username) }}" style="color: rgb(195, 19, 19);">{{ post.author.username }}</a>
               {% else %}
-                <a class="mr-2" href="{{ url_for('users.account', username=post.author.username) }}">{{ post.author.username }}</a>
+                <a class="mr-2" href="{{ url_for('users.account', username=post.author.username) }}" style="color: rgb(195, 19, 19);">{{ post.author.username }}</a>
               {% endif %}
-                <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+                <small class="text-muted" style="color: white;">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
                 {% if post.author == current_user %}
                     <div>
                         <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('posts.update_post', post_id=post.id) }}">UPDATE</a>
@@ -32,6 +32,43 @@
             {% if post.image_file %}
                 <img class="post-image" src="https://cdn.britannica.com/14/4814-004-7C0DF1BB/Flag-Ukraine.jpg" alt="Post Image">
             {% endif %}  
+            <script>
+              function updateLikeCount(action, post_id) {
+                  jQuery.ajax({
+                      type: 'POST',
+                      url: '/post/' + post_id + '/like',
+                      data: {'action': action},
+                      success: function(response) {
+                          jQuery('#like-count-' + post_id).text(response.likes);
+                          toggleLikeButtons(post_id, action);
+                      },
+                      error: function(error) {
+                          console.error(error);
+                      }
+                  });
+              }
+              
+              function toggleLikeButtons(post_id, action) {
+                  var likeButton = document.getElementById('like-button-' + post_id);
+                  var dislikeButton = document.getElementById('dislike-button-' + post_id);
+              
+                  if (action === 'increment') {
+                      likeButton.disabled = true;
+                      dislikeButton.disabled = false;
+                  } else if (action === 'decrement') {
+                      likeButton.disabled = false;
+                      dislikeButton.disabled = true;
+                  }
+              }
+              </script>
+              <div>
+                  <button id="like-button-{{ post.id }}" onclick="updateLikeCount('increment', {{ post.id }})" {% if current_user.id in post.likes|map(attribute="author")|list %} disabled {% endif %}>
+                      Like
+                  </button>
+                  <button id="dislike-button-{{ post.id }}" onclick="updateLikeCount('decrement', {{ post.id }})" {% if current_user.id not in post.likes|map(attribute="author")|list %} disabled {% endif %}>
+                      Dislike
+                  </button> 
+              </div>
             <a href="{{ url_for('posts.comment_post', post_id=post.id) }}">COMMENT</a>
         </div>
     </article>    

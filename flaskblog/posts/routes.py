@@ -7,13 +7,13 @@ from flaskblog.posts.forms import PostForm, CommentForm
 import urllib.parse
 from sqlalchemy import func, desc
 from werkzeug.utils import secure_filename
-from flaskblog.posts.s3_utils import upload_to_s3, allowed_file
+from flaskblog.s3_utils import upload_to_s3, allowed_file
 from werkzeug.datastructures import FileStorage
 import os
 import boto3
 import uuid
 from flask import app
-import jsonify
+from flask import jsonify
 
 posts = Blueprint('posts', __name__)
 
@@ -89,17 +89,30 @@ def delete_post(post_id):
     flash('YOUR POST HAS BEEN DELETED!', 'success')
     return redirect(url_for('main.home'))
 
-@posts.route('/post/<int:post_id>/like', methods=['POST'])
+@posts.route('/post/<int:post_id>/like', methods=['GET', 'POST'])
 @login_required
 def like_post(post_id):
     post = Post.query.get_or_404(post_id)
+    like = Like.query.filter_by(author=current_user.id, post_id=post_id).first()
     if request.method == 'POST':
+        print(request.form.get('action'))
         if request.form.get('action') == 'increment':
-            post.likes += 1
+            like = Like(author=current_user.id, post_id=post_id)
+            print(like)
+            db.session.add(like)
+            try:
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                logging.exception(e)
         elif request.form.get('action') == 'decrement':
-            post.likes -= 1
-        db.session.commit()
-        return jsonify({'likes': post.likes})    
+            db.session.delete(like)
+            try:
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                logging.exception(e)
+        return jsonify({'likes': len(post.likes)})    
 
 '''@posts.route('/like_post/<int:post_id>', methods=['GET'])
 @login_required

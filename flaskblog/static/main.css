@@ -1,8 +1,28 @@
 body {
-    background: #fafafa;
+    background: #edc9fb;
     color: #333333;
     margin-top: 5rem;
   }
+
+.glow-bg {
+    position: fixed;  
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    animation: glowingBackground 5s infinite alternate;
+}
+
+@keyframes glowingBackground {
+    0% {
+        background-color: #ff6347; /* Start color */
+        box-shadow: 0 0 10px #ff6347; /* Add glow effect */
+    }
+    100% {
+        background-color: #00bfff; /* End color */
+        box-shadow: 0 0 20px #00bfff; /* Increase glow effect */
+    }
+}
   
 h1, h2, h3, h4, h5, h6 {
     color: #444444;
@@ -13,7 +33,7 @@ h1, h2, h3, h4, h5, h6 {
   }
   
 .site-header .navbar-nav .nav-link {
-    color: #cbd5db;
+    color: #ffffff;
   }
   
 .site-header .navbar-nav .nav-link:hover {
@@ -23,6 +43,19 @@ h1, h2, h3, h4, h5, h6 {
 .site-header .navbar-nav .nav-link.active {
     font-weight: 500;
   }
+
+.navbar {
+    animation: glow 4s infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        box-shadow: 0 0 60px rgb(255, 17, 140);
+    }
+    to {
+        box-shadow: 0 0 60px rgb(197, 8, 235)
+    }
+}
   
 .content-section {
     background: #ffffff;
@@ -33,7 +66,7 @@ h1, h2, h3, h4, h5, h6 {
   }
   
 .article-title {
-    color: #444444;
+    color: #5c0f55;
   }
   
 a.article-title:hover {
@@ -161,7 +194,7 @@ a.article-title:hover {
 /* Style for the timestamp */
 .timestamp {
   font-size: 12px;
-  color: #888888;
+  color: #141414;
 }
 
 .messages-container {
@@ -179,4 +212,13 @@ a.article-title:hover {
   margin: 5px 0;
   text-decoration: none;
   color: #000; /* Change the color as needed */
+}
+
+.glass{
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border:1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }

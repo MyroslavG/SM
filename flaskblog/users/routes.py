@@ -62,7 +62,7 @@ def account():
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email
-    image_file = url_for('static', filename='images/' + current_user.image_file)
+    image_file = current_user.image_file
     return render_template('account.html', title='ACCOUNT', image_file=image_file, form=form) 
 
 @users.route("/user/<string:username>")
