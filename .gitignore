@@ -18,7 +18,7 @@ build/
 docs/_build/
 .vscode
 flaskblog/static/images/
-flaskblog/uploads
+#flaskblog/uploads
 site.db
 
 # Coverage reports
