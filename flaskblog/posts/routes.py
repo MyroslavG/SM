@@ -26,7 +26,8 @@ def new_post():
         media = None
 
         if form.media.data:  # Check if a media file is uploaded
-            uploaded_file = save_picture(form.media.data)
+            image = request.files["media"]
+            uploaded_file = save_picture(image)
             #if not allowed_file(uploaded_file):
             #    flash('File type not allowed.', 'danger')
             #    return redirect(request.url)
