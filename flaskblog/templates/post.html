@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
     <article class="media content-section glass">
-        <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/' + post.author.image_file) }}">
+      <img class="rounded-circle article-img" src="{{ post.author.image_file }}">
         <div class="media-body">
             <div class="article-metadata">
               {% if post.author != current_user %}
@@ -68,6 +68,7 @@
                   <button id="dislike-button-{{ post.id }}" onclick="updateLikeCount('decrement', {{ post.id }})" {% if current_user.id not in post.likes|map(attribute="author")|list %} disabled {% endif %}>
                       Dislike
                   </button> 
+                  <p id="like-count-{{ post.id }}">{{ post.count_likes() }}</p>
               </div>
             <a href="{{ url_for('posts.comment_post', post_id=post.id) }}">COMMENT</a>
         </div>

@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
     <article class="media content-section glass">
-        <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/' + user.image_file) }}">
+        <img class="rounded-circle article-img" src="{{ user.image_file }}">
         <div class="media-body">
             <h1 style="text-transform:uppercase">{{ user.username }}</h1>
             <p>{{ user.subscribers|length }}</p>
@@ -21,7 +21,6 @@
     
     {% for post in posts.items %}
         <article class="media content-section glass">
-            <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/' + post.author.image_file) }}">
             <div class="media-body">
                 <div class="article-metadata">
                     <a class="mr-2" href="{{ url_for('users.profile', username=post.author.username) }}" style="color: rgb(195, 19, 19);">{{ post.author.username }}</a>
@@ -69,6 +68,7 @@
                     <button id="dislike-button-{{ post.id }}" onclick="updateLikeCount('decrement', {{ post.id }})" {% if current_user.id not in post.likes|map(attribute="author")|list %} disabled {% endif %}>
                         Dislike
                     </button> 
+                    <p id="like-count-{{ post.id }}">{{ post.count_likes() }}</p>
                 </div>
             </div>
         </article>

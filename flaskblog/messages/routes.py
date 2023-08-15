@@ -10,6 +10,7 @@ import os
 from werkzeug.utils import secure_filename  
 import boto3
 from datetime import datetime
+from flask import jsonify
 #from flask_socketio import SocketIO, emit, join_room
 #from flaskblog import socketio
 
@@ -58,3 +59,25 @@ def send_message(chat_id):
     db.session.commit()
 
     return redirect(url_for('chats.chat_with_user', chat_id=chat_id, recipient_id=recipient.id))
+
+@chats.route('/check_chat', methods=['GET'])
+def check_chat():
+
+    # Query the database for unread messages for the current user
+    unread_messages = Message.query.filter_by(recipient_id=current_user.id, is_read=0).all()
+
+    # Mark the unread messages as read
+    for message in unread_messages:
+        message.is_read = 1
+    db.session.commit()
+
+    # Prepare data to return
+    chat_data = []
+    for message in unread_messages:
+        chat_data.append({
+            'sender': message.sender.username,
+            'content': message.message_content,
+            'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+        })
+
+    return jsonify({'chat_data': chat_data})

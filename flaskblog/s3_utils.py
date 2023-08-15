@@ -1,38 +1,30 @@
 import boto3
+import botocore
+import os
 import uuid
-from flask import app, current_app
+from flask import app
 
-def upload_to_s3(uploaded_file, file_name):
-    s3 = boto3.client('s3', aws_access_key_id='',
-                      aws_secret_access_key='')
-
-    #current_app.config['AWS_ACCESS_KEY']                  
-    #current_app.config['AWS_SECRET_KEY']
-
-    bucket_name = 'povodyrcom' #current_app.config['S3_BUCKET_NAME']
-    #s3 = boto3.resource("s3")
+def upload_to_s3(file, acl="public-read"):
+    s3 = boto3.client('s3', aws_access_key_id=os.environ.get('AWS_ACCESS_KEY'),
+                      aws_secret_access_key=os.environ.get('AWS_SECRET_KEY'))
+    
+    bucket_name = os.environ.get('S3_BUCKET_NAME')
+    S3_LOCATION = os.environ.get('S3_LOCATION')
 
     try:
-        s3.upload_file(
-            uploaded_file,
+        s3.upload_fileobj(
+            file,
             bucket_name,
-            uploaded_file.filename,
+            file.filename,
             ExtraArgs={
-                "ACL": "public-read",
-                "ContentType": uploaded_file.content_type
+                "ACL": acl,
+                "ContentType": file.content_type
             }
         )
-
     except Exception as e:
-        # This is a catch all exception, edit this part to fit your needs.
-        print("Something Happened: ", e)
-        return e
+        return {"errors": str(e)}
 
-    #s3.Bucket(bucket_name).upload_fileobj(uploaded_file, file_name)
-
-    #file = File(original_filename=uploaded_file.filename, filename=file_name,
-    #            bucket=bucket_name, region="us-east-2")
-    return 'https://povodyrcom.s3.amazonaws.com/' + file_name
+    return f"{S3_LOCATION}{file.filename}"
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'mov', 'mp4', 'avi', 'jpg', 'jpeg', 'gif'}

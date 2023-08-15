@@ -204,14 +204,23 @@ a.article-title:hover {
 
 .navigation {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  justify-content: space-around;
+  background-color: #601569;
+  padding: 10px;
 }
 
 .navigation a {
-  margin: 5px 0;
+  color: #FFFFFF;
   text-decoration: none;
-  color: #000; /* Change the color as needed */
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.navigation a:hover {
+  background-color: #FFFFFF;
+  color: #601569;
 }
 
 .glass{

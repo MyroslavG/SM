@@ -54,14 +54,16 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(100), nullable = False)
     date_posted = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
-    picture_file = db.Column(db.String(200))
-    video_file = db.Column(db.String(200))
+    media = db.Column(db.String(200))
     content = db.Column(db.Text, nullable = False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
     likes = db.relationship('Like', backref = 'post', lazy = True)
     comments = db.relationship('Comment', backref = 'post', lazy = True)
-    media_id = db.Column(db.Integer, db.ForeignKey('file.id'))
-    media = db.relationship('File', backref='post_media', uselist=False)
+    #media_id = db.Column(db.Integer, db.ForeignKey('file.id'))
+    #media = db.relationship('File', backref='post_media', uselist=False)
+
+    def count_likes(self):
+        return Like.query.filter_by(post_id=self.id).count()
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
@@ -104,6 +106,7 @@ class Message(db.Model):
     recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     message_content = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    is_read = db.Column(db.Boolean, default=False)
 
     def is_sent_by_user(self, user):
         return self.sender_id == user.id

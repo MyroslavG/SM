@@ -27,7 +27,10 @@
         <h2>FOUND:</h2>
         <ul>
             {% for user in search_results %}
-                <a class="mr-2" href="{{ url_for('users.profile', username=user.username) }}">{{ user.username }}</a>
+                <li>
+                    <img class="rounded-circle article-img" src="{{ user.image_file }}">
+                    <a class="mr-2" href="{{ url_for('users.profile', username=user.username) }}">{{ user.username }}</a>
+                </li>
             {% endfor %}
         </ul>
     {% else %}

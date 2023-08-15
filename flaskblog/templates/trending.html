@@ -3,7 +3,7 @@
     <h1 style="text-transform:uppercase">TRENDING</h1>
     {% for post, like_count in posts %}
         <article class="media content-section glass">
-            <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/' + post.author.image_file) }}">
+            <img class="rounded-circle article-img" src="{{ post.author.image_file }}">
             <div class="media-body">
                 <div class="article-metadata">
                     <a class="mr-2" href="{{ url_for('users.profile', username=post.author.username) }}">{{ post.author.username }}</a>

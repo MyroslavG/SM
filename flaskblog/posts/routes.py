@@ -8,6 +8,7 @@ import urllib.parse
 from sqlalchemy import func, desc
 from werkzeug.utils import secure_filename
 from flaskblog.s3_utils import upload_to_s3, allowed_file
+from flaskblog.users.utils import save_picture
 from werkzeug.datastructures import FileStorage
 import os
 import boto3
@@ -22,29 +23,15 @@ posts = Blueprint('posts', __name__)
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
-        picture_file = None
-        video_file = None
+        media = None
 
         if form.media.data:  # Check if a media file is uploaded
-            uploaded_file = form.media.data
-            if not allowed_file(uploaded_file):
-                flash('File type not allowed.', 'danger')
-                return redirect(request.url)
-
-            new_filename = uuid.uuid4().hex + '.' + uploaded_file.rsplit('.', 1)[1].lower()
-
-            s3 = boto3.resource("s3")
-            bucket = s3.Bucket(name=os.getenv('S3_BUCKET_NAME'))
-            bucket.upload_fileobj(uploaded_file, new_filename)
-
-            file = File(original_filename=uploaded_file.filename, filename=new_filename,
-                        bucket=bucket, region="us-east-2")
-
-            db.session.add(file)
-            db.session.commit()
-
-        post = Post(title=form.title.data, content=form.content.data, author=current_user,
-                    picture_file=picture_file, video_file=video_file)
+            uploaded_file = save_picture(form.media.data)
+            #if not allowed_file(uploaded_file):
+            #    flash('File type not allowed.', 'danger')
+            #    return redirect(request.url)
+            
+        post = Post(title=form.title.data, content=form.content.data, author=current_user, media=uploaded_file)
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!', 'success')
@@ -95,10 +82,8 @@ def like_post(post_id):
     post = Post.query.get_or_404(post_id)
     like = Like.query.filter_by(author=current_user.id, post_id=post_id).first()
     if request.method == 'POST':
-        print(request.form.get('action'))
         if request.form.get('action') == 'increment':
             like = Like(author=current_user.id, post_id=post_id)
-            print(like)
             db.session.add(like)
             try:
                 db.session.commit()

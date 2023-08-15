@@ -3,7 +3,32 @@
     <h2>CHATS</h2>
     <ul>
         {% for user in all_recipients %}
-            <li><a href="{{ url_for('chats.chat_with_user', recipient_id=user.id) }}" class="chat-link">{{ user.username }}</a></li>
+            <li>
+                <a href="{{ url_for('chats.chat_with_user', recipient_id=user.id) }}" class="chat-link">{{ user.username }}</a>
+                <span class="unread-message" id="unread-message-{{ user.id }}"></span>
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script>
+                    function checkChat() {
+                        $.get('/chat/check_chat', function(data) {
+                            var chatData = data.chat_data;
+                            var chatMessages = '';
+                
+                            // Loop through chat data to create chat messages
+                            chatData.forEach(function(message) {
+                                chatMessages += '<p><strong>' + message.sender + '</strong> ' + message.content + ' - ' + message.timestamp + '</p>';
+                            });
+                
+                            // Update the chat container with chat messages
+                            $('#chat-container').html(chatMessages);
+                        });
+                    }
+                
+                    // Call the checkChat function on page load
+                    $(document).ready(function() {
+                        checkChat();
+                    });
+                </script>
+            </li>
         {% endfor %}
     </ul>
 {% endblock content %}    

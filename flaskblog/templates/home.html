@@ -2,7 +2,7 @@
 {% block content %}
     {% for post in posts.items %}
         <article class="media content-section glass">
-            <img class="rounded-circle article-img" src="{{ url_for('static', filename='images/' + post.author.image_file) }}">
+            <img class="rounded-circle article-img" src="{{ post.author.image_file }}">
             <div class="media-body">
                 <div class="article-metadata">
                     <a class="mr-2" href="{{ url_for('users.profile', username=post.author.username) }}" style="color: rgb(195, 19, 19);">{{ post.author.username }}</a>
@@ -10,15 +10,10 @@
                 </div>
                 <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
                 <p class="article-content">{{ post.content }}</p>
-                {% if post.image_file %}
-                    <img class="post-image" src="https://cdn.britannica.com/14/4814-004-7C0DF1BB/Flag-Ukraine.jpg" alt="Post Image">
+                {% if post.media %}
+                    <iframe src="{{ post.media }}" frameborder="0" allowfullscreen></iframe>
                 {% endif %}  
 
-                {% if post.video_file %}
-                    {% set video_id = post.video_file.split('v=')[1][:11] %}
-
-                    <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ video_id }}" frameborder="0" allowfullscreen></iframe>
-                {% endif %}
                 <script>
                     function updateLikeCount(action, post_id) {
                         jQuery.ajax({
@@ -55,6 +50,7 @@
                     <button id="dislike-button-{{ post.id }}" onclick="updateLikeCount('decrement', {{ post.id }})" {% if current_user.id not in post.likes|map(attribute="author")|list %} disabled {% endif %}>
                         Dislike
                     </button> 
+                    <p id="like-count-{{ post.id }}">{{ post.count_likes() }}</p>
                 </div>
                 
                 <button class="collapsible-button" onclick="toggleCollapsibleContent, {{ post.id }}">COMMENTS</button>
