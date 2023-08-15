@@ -83,7 +83,7 @@ def like_post(post_id):
     post = Post.query.get_or_404(post_id)
     like = Like.query.filter_by(author=current_user.id, post_id=post_id).first()
     if request.method == 'POST':
-        if request.form.get('action') == 'increment':
+        if (request.form.get('action') == 'increment') and (not like):
             like = Like(author=current_user.id, post_id=post_id)
             db.session.add(like)
             try:

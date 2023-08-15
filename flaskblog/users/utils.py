@@ -12,7 +12,22 @@ def user_has_unread_message(current_user_id, recipient_id):
     unread_messages = Message.query.filter_by(recipient=user, sender_id=recipient_id, is_read=False).count()
     return unread_messages > 0
 
-def save_picture(form_picture):
+import requests
+import io
+
+def resize_image(uploaded_file, filename):
+    image = Image.open(uploaded_file)
+
+    width_percent = 1000 / image.width
+    height_percent = 1000 / image.height
+    resize_percent = min(width_percent, height_percent)
+    new_width = int(image.width * resize_percent)
+    new_height = int(image.height * resize_percent)
+    
+    image = image.resize((new_width, new_height))
+    return image, filename
+
+def save_picture(form_picture, filename):
     # random_hex = secrets.token_hex(8)
     # _, f_ext = os.path.splitext(form_picture.filename)
     # picture_fn = random_hex + f_ext

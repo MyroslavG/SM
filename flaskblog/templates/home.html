@@ -11,18 +11,18 @@
                 <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
                 <p class="article-content">{{ post.content }}</p>
                 {% if post.media %}
-                    <iframe src="{{ post.media }}" frameborder="0" allowfullscreen></iframe>
+                    <img src="{{ post.media }}" width="320" height="180" frameborder="0" allowfullscreen>
                 {% endif %}  
 
                 <script>
                     function updateLikeCount(action, post_id) {
+                        toggleLikeButtons(post_id, action);
                         jQuery.ajax({
                             type: 'POST',
                             url: '/post/' + post_id + '/like',
                             data: {'action': action},
                             success: function(response) {
                                 jQuery('#like-count-' + post_id).text(response.likes);
-                                toggleLikeButtons(post_id, action);
                             },
                             error: function(error) {
                                 console.error(error);
