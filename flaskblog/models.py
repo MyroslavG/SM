@@ -23,8 +23,8 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable = False)
     posts = db.relationship('Post', backref = 'author', lazy = True)
     date_registered = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
-    likes = db.relationship('Like', backref = 'user', lazy = True)
-    comments = db.relationship('Comment', backref = 'user', lazy = True)
+    likes = db.relationship('Like', backref = 'user', lazy='joined')
+    comments = db.relationship('Comment', backref = 'user', lazy='joined')
     subscribers = db.relationship('Subscription', foreign_keys=[Subscription.subscribed_to_id], backref=db.backref('subscriber'))
     subscribed_to = db.relationship('Subscription', foreign_keys=[Subscription.subscriber_id], backref=db.backref('subscribed_to'))
     sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', backref='sender')
@@ -57,8 +57,8 @@ class Post(db.Model):
     media = db.Column(db.String(200))
     content = db.Column(db.Text, nullable = False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
-    likes = db.relationship('Like', backref = 'post', lazy = True)
-    comments = db.relationship('Comment', backref = 'post', lazy = True)
+    likes = db.relationship('Like', backref = 'post', lazy='joined')
+    comments = db.relationship('Comment', backref = 'post', lazy='joined')
     #media_id = db.Column(db.Integer, db.ForeignKey('file.id'))
     #media = db.relationship('File', backref='post_media', uselist=False)
 
@@ -87,6 +87,9 @@ class Comment(db.Model):
             'user.id'), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey(
             'post.id'), nullable=False)    
+
+    def __repr__(self):
+        return f"Comment('{self.text}', '{self.date_created}', '{self.author}', '{self.post_id}')"        
 
 chat_participants = db.Table(
     'chat_participants',

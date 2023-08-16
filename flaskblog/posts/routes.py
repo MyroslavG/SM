@@ -24,14 +24,10 @@ def new_post():
     form = PostForm()
     if form.validate_on_submit():
         media = None
-
-        if form.media.data:  # Check if a media file is uploaded
+        if form.media.data: 
             image = request.files["media"]
             uploaded_file = save_picture(image)
-            #if not allowed_file(uploaded_file):
-            #    flash('File type not allowed.', 'danger')
-            #    return redirect(request.url)
-            
+
         post = Post(title=form.title.data, content=form.content.data, author=current_user, media=uploaded_file)
         db.session.add(post)
         db.session.commit()
@@ -55,6 +51,10 @@ def update_post(post_id):
     if form.validate_on_submit():
         post.title = form.title.data
         post.content = form.content.data
+        if form.media.data: 
+            image = request.files["media"]
+            uploaded_file = save_picture(image)
+        post.media = uploaded_file    
         db.session.commit()
         flash('YOUR POST HAS BEEN UPDATED!', 'success')
         return redirect(url_for('posts.post', post_id=post.id))
@@ -72,6 +72,10 @@ def delete_post(post_id):
     likes_to_delete = db.session.query(Like).filter(Like.post_id == post_id).all()
     for item in likes_to_delete:
         db.session.delete(item)
+    comments_to_delete = db.session.query(Comment).filter(Comment.post_id == post_id).all()
+    for item in comments_to_delete:
+        db.session.delete(item)
+
     db.session.delete(post)
     db.session.commit()
     flash('YOUR POST HAS BEEN DELETED!', 'success')
@@ -136,25 +140,23 @@ def profile_like_post(username, post_id):
         db.session.commit()
     return redirect(url_for('users.profile', username=username))   ''' 
 
-@posts.route('/comment_post/<int:post_id>', methods=['GET', 'POST'])
+@posts.route('/post/<int:post_id>/comment', methods=['POST'])
 @login_required
-def comment_post(post_id):
-    post = Post.query.get(post_id)
-    if not post:
-        flash('POST DOES NOT EXIST', 'danger')
-    else:
-        form = CommentForm()
-        if form.validate_on_submit():
-            text = form.comment_text.data
-            new_comment = Comment(text=text, author=current_user.id, post_id=post_id)
-            db.session.add(new_comment)
-            db.session.commit()
-            flash('COMMENT ADDED', 'success')
-            return redirect(url_for('main.home'))
-        else:
-            flash('PLEASE ENTER A COMMENT', 'danger')
+def add_comment(post_id):
+    post = Post.query.get_or_404(post_id)
+    comment_text = request.form.get('comment_text')
+    comment = Comment(text=comment_text, post_id=post.id, author=current_user.id)
+    db.session.add(comment)
+    db.session.commit()
+    return jsonify({'status': 'success'})
 
-    return render_template('comment.html', title='LOGIN', form=form, post=post) 
+@posts.route('/post/<int:post_id>/get_comments', methods=['GET'])
+def get_comments(post_id):
+    post = Post.query.get_or_404(post_id)
+    comments_html = ""
+    for comment in post.comments:
+        comments_html += "<p>" + comment.author + ": " + comment.text + "</p>"
+    return jsonify({'comments_html': comments_html})    
 
 @posts.route('/trending')
 def trending():

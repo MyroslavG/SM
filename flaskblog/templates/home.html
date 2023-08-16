@@ -1,78 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
     {% for post in posts.items %}
-        <article class="media content-section glass">
-            <img class="rounded-circle article-img" src="{{ post.author.image_file }}">
-            <div class="media-body">
-                <div class="article-metadata">
-                    <a class="mr-2" href="{{ url_for('users.profile', username=post.author.username) }}" style="color: rgb(195, 19, 19);">{{ post.author.username }}</a>
-                    <small class="text-muted" style="color: white;">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
-                </div>
-                <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
-                <p class="article-content">{{ post.content }}</p>
-                {% if post.media %}
-                    <img src="{{ post.media }}" width="320" height="180" frameborder="0" allowfullscreen>
-                {% endif %}  
-
-                <script>
-                    function updateLikeCount(action, post_id) {
-                        toggleLikeButtons(post_id, action);
-                        jQuery.ajax({
-                            type: 'POST',
-                            url: '/post/' + post_id + '/like',
-                            data: {'action': action},
-                            success: function(response) {
-                                jQuery('#like-count-' + post_id).text(response.likes);
-                            },
-                            error: function(error) {
-                                console.error(error);
-                            }
-                        });
-                    }
-                    
-                    function toggleLikeButtons(post_id, action) {
-                        var likeButton = document.getElementById('like-button-' + post_id);
-                        var dislikeButton = document.getElementById('dislike-button-' + post_id);
-                    
-                        if (action === 'increment') {
-                            likeButton.disabled = true;
-                            dislikeButton.disabled = false;
-                        } else if (action === 'decrement') {
-                            likeButton.disabled = false;
-                            dislikeButton.disabled = true;
-                        }
-                    }
-                    </script>
-                <div>
-                    <button id="like-button-{{ post.id }}" onclick="updateLikeCount('increment', {{ post.id }})" {% if current_user.id in post.likes|map(attribute="author")|list %} disabled {% endif %}>
-                        Like
-                    </button>
-                    <button id="dislike-button-{{ post.id }}" onclick="updateLikeCount('decrement', {{ post.id }})" {% if current_user.id not in post.likes|map(attribute="author")|list %} disabled {% endif %}>
-                        Dislike
-                    </button> 
-                    <p id="like-count-{{ post.id }}">{{ post.count_likes() }}</p>
-                </div>
-                
-                <button class="collapsible-button" onclick="toggleCollapsibleContent, {{ post.id }}">COMMENTS</button>
-                <div class="collapsible-content" id="comments-{{ post.id }}">
-                    {% for comment in post.comments %}
-                        <p>
-                            <strong>{{ comment.author.username }}</strong>: {{ comment.text }}
-                        </p>
-                    {% endfor %}
-                </div>
-                <script>
-                    function toggleCollapsibleContent(post_id) {
-                        var content = document.getElementById("comments-" + post_id);
-                        if (content.style.display === "none") {
-                            content.style.display = "block";
-                        } else {
-                            content.style.display = "none";
-                        }
-                    }
-                </script>
-            </div>
-        </article>
+        {% with post=post %}
+            {% include "article.html" %}
+        {% endwith %}
     {% endfor %}     
     {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
         {% if page_num %}

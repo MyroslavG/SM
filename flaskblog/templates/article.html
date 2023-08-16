@@ -1,0 +1,41 @@
+<article class="media content-section glass">
+    <img class="rounded-circle article-img" src="{{ post.author.image_file }}">
+    <div class="media-body">
+        <div class="article-metadata">
+            {% if post.author != current_user %}
+                <a class="mr-2" href="{{ url_for('users.profile', username=post.author.username) }}" style="color: rgb(195, 19, 19);">{{ post.author.username }}</a>
+            {% else %}
+                <a class="mr-2" href="{{ url_for('users.account') }}" style="color: rgb(195, 19, 19);">{{ post.author.username }}</a>
+            {% endif %}
+            <small class="text-muted" style="color: white;">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
+        </div>
+        <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
+        <p class="article-content">{{ post.content }}</p>
+        {% if post.media %}
+            <img src="{{ post.media }}" width="320" height="180" frameborder="0" allowfullscreen>
+        {% endif %}  
+
+        <div>
+            <button id="like-button-{{ post.id }}" onclick="updateLikeCount('increment', {{ post.id }})" {% if current_user.id in post.likes|map(attribute="author")|list %} disabled {% endif %}>
+                Like
+            </button>
+            <button id="dislike-button-{{ post.id }}" onclick="updateLikeCount('decrement', {{ post.id }})" {% if current_user.id not in post.likes|map(attribute="author")|list %} disabled {% endif %}>
+                Dislike
+            </button> 
+            <p id="like-count-{{ post.id }}">{{ post.count_likes() }}</p>
+        </div>
+        
+        <button class="collapsible-button" onclick="toggleCollapsibleContent({{ post.id }})">COMMENTS</button>
+        <div class="collapsible-content" id="comments-{{ post.id }}">
+            {% for comment in post.comments %}
+                <p><strong>{{ comment.user.username }}</strong> : {{ comment.text }}</p>
+            {% endfor %}
+
+            <form id="comment-form-{{ post.id }}" class="comment-form" onsubmit="submitComment({{ post.id }}); return false;">
+                <input type="text" id="comment-input-{{ post.id }}" placeholder="Write a comment...">
+                <button type="submit">Comment</button>
+            </form>
+        </div>
+    </div>
+</article>
+<script src="{{ url_for('static', filename='js/article.js') }}"></script>

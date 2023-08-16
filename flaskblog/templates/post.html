@@ -1,94 +1,31 @@
 {% extends "layout.html" %}
 {% block content %}
-    <article class="media content-section glass">
-      <img class="rounded-circle article-img" src="{{ post.author.image_file }}">
-        <div class="media-body">
-            <div class="article-metadata">
-              {% if post.author != current_user %}
-                <a class="mr-2" href="{{ url_for('users.profile', username=post.author.username) }}" style="color: rgb(195, 19, 19);">{{ post.author.username }}</a>
-              {% else %}
-                <a class="mr-2" href="{{ url_for('users.account', username=post.author.username) }}" style="color: rgb(195, 19, 19);">{{ post.author.username }}</a>
-              {% endif %}
-                <small class="text-muted" style="color: white;">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
-                {% if post.author == current_user %}
-                    <div>
-                        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('posts.update_post', post_id=post.id) }}">UPDATE</a>
-                        <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">DELETE</button>
+    {% with post=post %}
+        {% include "article.html" %}
+            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">DELETE POST?</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">CLOSE</button>
+                            <form action="{{ url_for('posts.delete_post', post_id=post.id) }}" method="POST">
+                                <input class="btn btn-danger" type="submit" value="DELETE">
+                            </form>
+                        </div>
                     </div>
-                {% endif %} 
-              <div>
-                <p>{{ post.author.subscribers|length }}</p>
-                  {% if current_user.username != post.author.username %}
-                      {% if current_user.id in post.author.subscribers|map(attribute="author")|list %}
-                              <a href="{{ url_for('users.subscribe', username=post.author.username) }}"><i class="fa-solid fa-minus"></i></a>
-                          {% else %}
-                              <a href="{{ url_for('users.subscribe', username=post.author.username) }}"><i class="fa-solid fa-plus"></i></a>
-                      {% endif %}
-                  {% endif %}    
-              </div>     
+                </div>
+            </div>    
+
+        {% if post.author == current_user %}
+            <div>
+                <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('posts.update_post', post_id=post.id) }}">UPDATE</a>
+                <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">DELETE</button>
             </div>
-            <h2 class="article-title">{{ post.title }}</h2>
-            <p class="article-content">{{ post.content }}</p>
-            {% if post.image_file %}
-                <img class="post-image" src="https://cdn.britannica.com/14/4814-004-7C0DF1BB/Flag-Ukraine.jpg" alt="Post Image">
-            {% endif %}  
-            <script>
-              function updateLikeCount(action, post_id) {
-                  jQuery.ajax({
-                      type: 'POST',
-                      url: '/post/' + post_id + '/like',
-                      data: {'action': action},
-                      success: function(response) {
-                          jQuery('#like-count-' + post_id).text(response.likes);
-                          toggleLikeButtons(post_id, action);
-                      },
-                      error: function(error) {
-                          console.error(error);
-                      }
-                  });
-              }
-              
-              function toggleLikeButtons(post_id, action) {
-                  var likeButton = document.getElementById('like-button-' + post_id);
-                  var dislikeButton = document.getElementById('dislike-button-' + post_id);
-              
-                  if (action === 'increment') {
-                      likeButton.disabled = true;
-                      dislikeButton.disabled = false;
-                  } else if (action === 'decrement') {
-                      likeButton.disabled = false;
-                      dislikeButton.disabled = true;
-                  }
-              }
-              </script>
-              <div>
-                  <button id="like-button-{{ post.id }}" onclick="updateLikeCount('increment', {{ post.id }})" {% if current_user.id in post.likes|map(attribute="author")|list %} disabled {% endif %}>
-                      Like
-                  </button>
-                  <button id="dislike-button-{{ post.id }}" onclick="updateLikeCount('decrement', {{ post.id }})" {% if current_user.id not in post.likes|map(attribute="author")|list %} disabled {% endif %}>
-                      Dislike
-                  </button> 
-                  <p id="like-count-{{ post.id }}">{{ post.count_likes() }}</p>
-              </div>
-            <a href="{{ url_for('posts.comment_post', post_id=post.id) }}">COMMENT</a>
-        </div>
-    </article>    
-    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="deleteModalLabel">DELETE POST?</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">CLOSE</button>
-              <form action="{{ url_for('posts.delete_post', post_id=post.id) }}" method="POST">
-                <input class="btn btn-danger" type="submit" value="DELETE">
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
+        {% endif %}     
+    {% endwith %}
 {% endblock content %}    

@@ -56,4 +56,9 @@
                 </div>
             </form>
     </div>
+    {% for post in current_user.posts|sort(reverse=True, attribute='date_posted') %}
+        {% with post=post %}
+            {% include "article.html" %}
+        {% endwith %}
+    {% endfor %}    
 {% endblock content %}  
