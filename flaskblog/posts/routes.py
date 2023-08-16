@@ -155,7 +155,7 @@ def get_comments(post_id):
     post = Post.query.get_or_404(post_id)
     comments_html = ""
     for comment in post.comments:
-        comments_html += "<p>" + comment.user.username + ': ' + comment.text + "</p>"
+        comments_html += "<p>" + comment.user.username + ': ' + comment.text + current_user.username + "</p>"
     return jsonify({'comments_html': comments_html})    
 
 @posts.route('/post/<int:post_id>/comment/<int:comment_id>/delete', methods=['GET', 'POST'])

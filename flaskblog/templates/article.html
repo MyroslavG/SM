@@ -1,13 +1,17 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <article class="media content-section glass">
+    <div id="current-user-info" data-user-id="{{ current_user.id }}"></div>
+
     <img class="rounded-circle article-img" src="{{ post.author.image_file }}">
     <div class="media-body">
         <div class="article-metadata">
-            {% if post.author != current_user %}
-                <a class="mr-2" href="{{ url_for('users.profile', username=post.author.username) }}" style="color: rgb(195, 19, 19);">{{ post.author.username }}</a>
-            {% else %}
-                <a class="mr-2" href="{{ url_for('users.account') }}" style="color: rgb(195, 19, 19);">{{ post.author.username }}</a>
-            {% endif %}
+            <strong>
+                {% if post.author != current_user %}
+                    <a class="mr-2" href="{{ url_for('users.profile', username=post.author.username) }}" style="color: rgb(195, 19, 19);">{{ post.author.username }}</a>
+                {% else %}
+                    <a class="mr-2" href="{{ url_for('users.account') }}" style="color: rgb(195, 19, 19);">{{ post.author.username }}</a>
+                {% endif %}
+            </strong>
             <small class="text-muted" style="color: white;">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
         </div>
         <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
@@ -26,10 +30,18 @@
             <p id="like-count-{{ post.id }}">{{ post.count_likes() }}</p>
         </div>
         
-        <button class="collapsible-button" onclick="toggleCollapsibleContent({{ post.id }})">COMMENTS</button>
         <div class="collapsible-content" id="comments-{{ post.id }}">
             {% for comment in post.comments %}
-                <p><strong>{{ comment.user.username }}</strong> : {{ comment.text }}</p>
+                <p>
+                    <strong>
+                        {% if comment.user != current_user %}
+                            <a class="mr-2" href="{{ url_for('users.profile', username=comment.user.username) }}" style="color: rgb(195, 19, 19);">{{ comment.user.username }}</a>
+                        {% else %}
+                            <a class="mr-2" href="{{ url_for('users.account') }}" style="color: rgb(195, 19, 19);">{{ comment.user.username }}</a>
+                        {% endif %}
+                    </strong>
+                    {{ comment.text }}
+                </p>
                 <!--
                     <div class="comment-actions">
                         {% if current_user == comment.user %}
@@ -47,6 +59,7 @@
                 <button type="submit">Comment</button>
             </form>
         </div>
+        <button class="collapsible-button" data-post-id="{{ post.id }}" onclick="toggleCollapsibleContent({{ post.id }})">COMMENTS</button>
     </div>
 </article>
 <script src="{{ url_for('static', filename='js/article.js') }}"></script>

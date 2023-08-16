@@ -251,3 +251,11 @@ a.article-title:hover {
   max-width: 100%;
   height: auto;
 }
+
+.collapsible-content {
+  display: none; /* Hide by default */
+}
+
+.collapsible-content.active {
+  display: block; /* Display when active class is added */
+}
