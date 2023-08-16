@@ -153,10 +153,7 @@ def add_comment(post_id):
 @posts.route('/post/<int:post_id>/get_comments', methods=['GET'])
 def get_comments(post_id):
     post = Post.query.get_or_404(post_id)
-    comments_html = ""
-    for comment in post.comments:
-        comments_html += "<p>" + comment.user.username + ': ' + comment.text + current_user.username + "</p>"
-    return jsonify({'comments_html': comments_html})    
+    return render_template("comment.html", post=post)  
 
 @posts.route('/post/<int:post_id>/comment/<int:comment_id>/delete', methods=['GET', 'POST'])
 @login_required

@@ -1,22 +1,3 @@
-var currentUserId = document.getElementById("current-user-info").dataset.userId;
-
-function getUsername(comment) {
-    if (comment.user !== null) {
-        return comment.user.username;
-    } else {
-        return "Unknown User";
-    }
-}
-
-function urlForProfile(username) {
-    return `/users/profile/${username}`;
-}
-
-// Function to generate the account URL
-function urlForAccount() {
-    return `/users/account`;
-}
-
 function updateLikeCount(action, post_id) {
     toggleLikeButtons(post_id, action);
     jQuery.ajax({
@@ -48,6 +29,7 @@ function toggleLikeButtons(post_id, action) {
 function toggleCollapsibleContent(post_id) {
     var content = document.getElementById("comments-" + post_id);
     content.classList.toggle("active"); // Toggle the active class
+    updateComments(post_id);
 }
 
 function submitComment(post_id) {
@@ -78,23 +60,7 @@ function updateComments(post_id) {
         $.get('/post/' + post_id + '/get_comments', function(data) {
             var commentsContainer = document.getElementById("comments-" + post_id);
             
-            var commentsHtml = '';
-            for (var i = 0; i < data.comments_html.length; i++) {
-                var comment = data.comments_html[i];
-                var commentHtml = `
-                    <p>
-                        <strong>
-                            ${comment.user !== currentUserId
-                                ? `<a class="mr-2" href="${urlForProfile(getUsername(comment))}" style="color: rgb(195, 19, 19);">${getUsername(comment)}</a>`
-                                : `<a class="mr-2" href="${urlForAccount()}" style="color: rgb(195, 19, 19);">${getUsername(comment)}</a>`
-                            }
-                        </strong>
-                        ${comment.text}
-                    </p>`;
-                commentsHtml += commentHtml;
-            }
-            
-            commentsContainer.innerHTML = commentsHtml;
+            commentsContainer.innerHTML = data;
 
             updatingComments = false;
         });

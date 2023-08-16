@@ -20,3 +20,7 @@
         </div>
     -->
 {% endfor %}
+    <form id="comment-form-{{ post.id }}" class="comment-form" onsubmit="submitComment({{ post.id }}); return false;">
+        <input type="text" id="comment-input-{{ post.id }}" placeholder="Write a comment...">
+        <button type="submit">Comment</button>
+    </form>
