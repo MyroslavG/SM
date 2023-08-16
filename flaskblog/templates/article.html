@@ -1,4 +1,3 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <article class="media content-section glass">
     <div id="current-user-info" data-user-id="{{ current_user.id }}"></div>
 
@@ -31,28 +30,7 @@
         </div>
         
         <div class="collapsible-content" id="comments-{{ post.id }}">
-            {% for comment in post.comments %}
-                <p>
-                    <strong>
-                        {% if comment.user != current_user %}
-                            <a class="mr-2" href="{{ url_for('users.profile', username=comment.user.username) }}" style="color: rgb(195, 19, 19);">{{ comment.user.username }}</a>
-                        {% else %}
-                            <a class="mr-2" href="{{ url_for('users.account') }}" style="color: rgb(195, 19, 19);">{{ comment.user.username }}</a>
-                        {% endif %}
-                    </strong>
-                    {{ comment.text }}
-                </p>
-                <!--
-                    <div class="comment-actions">
-                        {% if current_user == comment.user %}
-                            <form class="delete-comment-form" data-comment-id="{{ comment.id }}" data-post-id="{{ post.id }}">
-                                <button type="button" class="btn btn-danger btn-sm delete-comment-btn">Delete</button>
-                            </form>
-                        {% endif %}
-                        
-                    </div>
-                -->
-            {% endfor %}
+            
 
             <form id="comment-form-{{ post.id }}" class="comment-form" onsubmit="submitComment({{ post.id }}); return false;">
                 <input type="text" id="comment-input-{{ post.id }}" placeholder="Write a comment...">
@@ -62,4 +40,3 @@
         <button class="collapsible-button" data-post-id="{{ post.id }}" onclick="toggleCollapsibleContent({{ post.id }})">COMMENTS</button>
     </div>
 </article>
-<script src="{{ url_for('static', filename='js/article.js') }}"></script>

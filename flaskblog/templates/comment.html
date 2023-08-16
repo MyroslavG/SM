@@ -1,26 +1,22 @@
-{% extends "layout.html" %}
-{% block content %}
-    <form method="POST" action="">
-        {{ form.hidden_tag() }}
-        <fieldset class="form-group">
-            <legend class="border-bottom mb-4">COMMENT THE POST BY {{ post.author.username }}</legend>
-            <div class="form-group">
-                {{ form.comment_text.label(class="form-control-label") }}
-
-                {% if form.comment_text.errors %}
-                    {{ form.comment_text(class="form-control form-control-lg is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.comment_text.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %} 
-                    {{ form.comment_text(class="form-control form-control-lg") }}
-                {% endif %}
-            </div>
-        </fieldset>
-        <div class="form-group">
-            {{ form.submit(class="btn btn-outline-info") }}
+{% for comment in post.comments %}
+    <p>
+        <strong>
+            {% if comment.user != current_user %}
+                <a class="mr-2" href="{{ url_for('users.profile', username=comment.user.username) }}" style="color: rgb(195, 19, 19);">{{ comment.user.username }}</a>
+            {% else %}
+                <a class="mr-2" href="{{ url_for('users.account') }}" style="color: rgb(195, 19, 19);">{{ comment.user.username }}</a>
+            {% endif %}
+        </strong>
+        {{ comment.text }}
+    </p>
+    <!--
+        <div class="comment-actions">
+            {% if current_user == comment.user %}
+                <form class="delete-comment-form" data-comment-id="{{ comment.id }}" data-post-id="{{ post.id }}">
+                    <button type="button" class="btn btn-danger btn-sm delete-comment-btn">Delete</button>
+                </form>
+            {% endif %}
+            
         </div>
-    </form>
-{% endblock content %}    
+    -->
+{% endfor %}
