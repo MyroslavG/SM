@@ -155,8 +155,20 @@ def get_comments(post_id):
     post = Post.query.get_or_404(post_id)
     comments_html = ""
     for comment in post.comments:
-        comments_html += "<p>" + comment.author + ": " + comment.text + "</p>"
+        comments_html += "<p>" + comment.user.username + ': ' + comment.text + "</p>"
     return jsonify({'comments_html': comments_html})    
+
+@posts.route('/post/<int:post_id>/comment/<int:comment_id>/delete', methods=['GET', 'POST'])
+@login_required
+def delete_comment(post_id, comment_id):
+    comment = Comment.query.get_or_404(comment_id)
+    if comment.user != current_user:
+        return jsonify({'status': 'error', 'message': 'You are not authorized to delete this comment.'}), 403
+    
+    db.session.delete(comment)
+    db.session.commit()
+    
+    return jsonify({'status': 'success', 'message': 'Comment deleted successfully.'})    
 
 @posts.route('/trending')
 def trending():

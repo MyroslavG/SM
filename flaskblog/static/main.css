@@ -231,3 +231,23 @@ a.article-title:hover {
   border:1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
+
+.comment {
+  margin-bottom: 10px;
+  overflow: hidden; /* Clear the floats */
+}
+
+.comment p {
+  float: left;
+  width: 80%; /* Adjust this value as needed */
+}
+
+.comment-actions {
+  float: right;
+  width: 20%; /* Adjust this value as needed */
+}
+
+.responsive-image {
+  max-width: 100%;
+  height: auto;
+}

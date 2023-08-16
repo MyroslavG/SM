@@ -54,9 +54,17 @@ function submitComment(post_id) {
     });
 }
 
+var updatingComments = false;  // Flag to track if an update is in progress
+
 function updateComments(post_id) {
-    $.get('/post/' + post_id + '/get_comments', function(data) {
-        var commentsContainer = document.getElementById("comments-" + post_id);
-        commentsContainer.innerHTML = data.comments_html;
-    });
+    if (!updatingComments) {  // Check if an update is not already in progress
+        updatingComments = true;  // Set the flag to true
+        
+        $.get('/post/' + post_id + '/get_comments', function(data) {
+            var commentsContainer = document.getElementById("comments-" + post_id);
+            commentsContainer.innerHTML = data.comments_html;
+            
+            updatingComments = false;  // Reset the flag when update is complete
+        });
+    }
 }
