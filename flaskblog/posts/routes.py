@@ -81,7 +81,7 @@ def delete_post(post_id):
     flash('YOUR POST HAS BEEN DELETED!', 'success')
     return redirect(url_for('main.home'))
 
-@posts.route('/post/<int:post_id>/like', methods=['GET', 'POST'])
+@posts.route('/post/<int:post_id>/like', methods=['POST'])
 @login_required
 def like_post(post_id):
     post = Post.query.get_or_404(post_id)
@@ -148,12 +148,13 @@ def add_comment(post_id):
     comment = Comment(text=comment_text, post_id=post.id, author=current_user.id)
     db.session.add(comment)
     db.session.commit()
-    return jsonify({'status': 'success'})
+    return jsonify({'comments': len(post.comments)})
 
 @posts.route('/post/<int:post_id>/get_comments', methods=['GET'])
 def get_comments(post_id):
     post = Post.query.get_or_404(post_id)
-    return render_template("comment.html", post=post)  
+    comments_count = len(post.comments)
+    return render_template("comment.html", post=post, comments_count=comments_count)  
 
 @posts.route('/post/<int:post_id>/comment/<int:comment_id>/delete', methods=['GET', 'POST'])
 @login_required

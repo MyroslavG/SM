@@ -1,3 +1,4 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <article class="media content-section glass">
     <div id="current-user-info" data-user-id="{{ current_user.id }}"></div>
 
@@ -19,19 +20,23 @@
             <img src="{{ post.media }}" class="responsive-image" alt="Responsive Image">
         {% endif %}  
 
-        <div>
-            <button id="like-button-{{ post.id }}" onclick="updateLikeCount('increment', {{ post.id }})" {% if current_user.id in post.likes|map(attribute="author")|list %} disabled {% endif %}>
-                Like
-            </button>
-            <button id="dislike-button-{{ post.id }}" onclick="updateLikeCount('decrement', {{ post.id }})" {% if current_user.id not in post.likes|map(attribute="author")|list %} disabled {% endif %}>
-                Dislike
-            </button> 
-            <p id="like-count-{{ post.id }}">{{ post.count_likes() }}</p>
-        </div>
-        
-        <div class="collapsible-content" id="comments-{{ post.id }}">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <button id="like-button-{{ post.id }}" onclick="{% if current_user.is_authenticated %} updateLikeCount('increment', {{ post.id }}) {% else %} window.location.href = '{{ url_for('users.login') }}'; {% endif %}" {% if current_user.id in post.likes|map(attribute="author")|list %} disabled {% endif %}>
+                    LIKE
+                </button>
+                <button id="dislike-button-{{ post.id }}" onclick="{% if current_user.is_authenticated %} updateLikeCount('decrement', {{ post.id }}) {% else %} window.location.href = '{{ url_for('users.login') }}'; {% endif %}" {% if current_user.id not in post.likes|map(attribute="author")|list %} disabled {% endif %}>
+                    DISLIKE
+                </button>
+                <span id="like-count-{{ post.id }}">{{ post.count_likes() }}</span>
+            </div>
             
+            <button id="comment-count-{{ post.id }}" class="collapsible-button" onclick="toggleCollapsibleContent({{ post.id }})">
+                COMMENTS {{ post.count_comments() }}
+            </button>
+        </div>    
+        <div class="collapsible-content" id="comments-{{ post.id }}">
+                
         </div>
-        <button class="collapsible-button" data-post-id="{{ post.id }}" onclick="toggleCollapsibleContent({{ post.id }})">COMMENTS</button>
     </div>
 </article>

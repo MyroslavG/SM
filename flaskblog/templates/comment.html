@@ -1,26 +1,31 @@
 {% for comment in post.comments %}
-    <p>
-        <strong>
-            {% if comment.user != current_user %}
-                <a class="mr-2" href="{{ url_for('users.profile', username=comment.user.username) }}" style="color: rgb(195, 19, 19);">{{ comment.user.username }}</a>
-            {% else %}
-                <a class="mr-2" href="{{ url_for('users.account') }}" style="color: rgb(195, 19, 19);">{{ comment.user.username }}</a>
-            {% endif %}
-        </strong>
-        {{ comment.text }}
-    </p>
-    <!--
+    <div class="d-flex justify-content-between align-items-start">
+        <p class="comment p">
+            <strong>
+                {% if comment.user != current_user %}
+                    <a class="mr-2" href="{{ url_for('users.profile', username=comment.user.username) }}" style="color: rgb(195, 19, 19);">{{ comment.user.username }}</a>
+                {% else %}
+                    <a class="mr-2" href="{{ url_for('users.account') }}" style="color: rgb(195, 19, 19);">{{ comment.user.username }}</a>
+                {% endif %}
+            </strong>
+            {{ comment.text }}
+        </p>
         <div class="comment-actions">
-            {% if current_user == comment.user %}
-                <form class="delete-comment-form" data-comment-id="{{ comment.id }}" data-post-id="{{ post.id }}">
-                    <button type="button" class="btn btn-danger btn-sm delete-comment-btn">Delete</button>
-                </form>
-            {% endif %}
-            
-        </div>
-    -->
+            {% if current_user.is_authenticated %}
+                {% if current_user == comment.user %}
+                    <form class="delete-comment-form" data-comment-id="{{ comment.id }}">
+                        <button type="button" class="btn btn-danger btn-sm delete-comment-btn">DELETE</button>
+                    </form>
+                {% endif %}
+            {% endif %}    
+        </div>    
+    </div>
 {% endfor %}
     <form id="comment-form-{{ post.id }}" class="comment-form" onsubmit="submitComment({{ post.id }}); return false;">
         <input type="text" id="comment-input-{{ post.id }}" placeholder="Write a comment...">
-        <button type="submit">Comment</button>
+        {% if current_user.is_authenticated %}
+            <button type="submit">COMMENT</button>
+        {% else %}
+            <button type="button" onclick="window.location.href='{{ url_for('users.login') }}'">COMMENT</button>
+        {% endif %}
     </form>

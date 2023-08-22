@@ -1,3 +1,5 @@
+src="https://code.jquery.com/jquery-3.6.0.min.js"
+
 function updateLikeCount(action, post_id) {
     toggleLikeButtons(post_id, action);
     jQuery.ajax({
@@ -7,8 +9,13 @@ function updateLikeCount(action, post_id) {
         success: function(response) {
             jQuery('#like-count-' + post_id).text(response.likes);
         },
-        error: function(error) {
-            console.error(error);
+        error: function(xhr) {
+            if (xhr.status === 401) {
+                // User is not logged in, redirect to login page
+                window.location.href = 'users.login';
+            } else {
+                console.error(error);
+            }
         }
     });
 }
@@ -42,11 +49,17 @@ function submitComment(post_id) {
         data: {'comment_text': commentText},
         success: function(response) {
             // Clear the input field and update the comments section
+            jQuery('#comment-count-' + post_id).text(response.comments);
             commentInput.value = "";
             updateComments(post_id);
         },
-        error: function(error) {
-            console.error(error);
+        error: function(xhr) {
+            if (xhr.status === 401) {
+                // User is not logged in, redirect to login page
+                window.location.href = 'users.login';
+            } else {
+                console.error(error);
+            }
         }
     });
 }
@@ -59,10 +72,31 @@ function updateComments(post_id) {
 
         $.get('/post/' + post_id + '/get_comments', function(data) {
             var commentsContainer = document.getElementById("comments-" + post_id);
-            
             commentsContainer.innerHTML = data;
 
             updatingComments = false;
         });
     }
 }
+
+$(document).ready(function() {
+    $('.delete-comment-btn').click(function() {
+        var commentId = $(this).closest('.delete-comment-form').data('comment-id');
+        
+        $.ajax({
+            type: 'POST',
+            url: '/post/' + postId + '/comment/' + commentId + '/delete',
+            success: function(response) {
+                if (response.status === 'success') {
+                    // Reload the comments section after successful deletion
+                    updateComments(post_id);
+                } else {
+                    alert(response.message);  // Show error message
+                }
+            },
+            error: function(error) {
+                console.error(error);
+            }
+        });
+    });
+});

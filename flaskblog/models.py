@@ -65,6 +65,9 @@ class Post(db.Model):
     def count_likes(self):
         return Like.query.filter_by(post_id=self.id).count()
 
+    def count_comments(self):
+        return Comment.query.filter_by(post_id=self.id).count()    
+
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
 

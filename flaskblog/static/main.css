@@ -239,7 +239,7 @@ a.article-title:hover {
 
 .comment p {
   float: left;
-  width: 80%; /* Adjust this value as needed */
+  width: 50%; /* Adjust this value as needed */
 }
 
 .comment-actions {
