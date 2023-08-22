@@ -8,7 +8,7 @@
                     <a class="mr-2" href="{{ url_for('users.account') }}" style="color: rgb(195, 19, 19);">{{ comment.user.username }}</a>
                 {% endif %}
             </strong>
-            {{ comment.text }}
+            {{ comment.text|mention_links }}
         </p>
         <div class="comment-actions">
             {% if current_user.is_authenticated %}

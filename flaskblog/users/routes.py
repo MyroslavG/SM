@@ -56,12 +56,14 @@ def account():
             picture_file = save_picture(image)
             current_user.image_file = picture_file
         current_user.username = form.username.data
+        current_user.bio = form.bio.data
         current_user.email = form.email.data
         db.session.commit()
         flash('YOUR ACCOUNT HAS BEEN UPDATED!', 'success')
         return redirect(url_for('users.account'))
     elif request.method == 'GET':
         form.username.data = current_user.username
+        form.bio.data = current_user.bio
         form.email.data = current_user.email
     image_file = current_user.image_file
     return render_template('account.html', title='ACCOUNT', image_file=image_file, form=form) 

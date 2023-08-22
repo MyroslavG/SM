@@ -21,6 +21,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique = True, nullable = False)
     image_file = db.Column(db.String(255), nullable = False, default='default.jpg')  
     password = db.Column(db.String(60), nullable = False)
+    bio = db.Column(db.String(350))
     posts = db.relationship('Post', backref = 'author', lazy = True)
     date_registered = db.Column(db.DateTime, nullable = False, default = datetime.utcnow)
     likes = db.relationship('Like', backref = 'user', lazy='joined')

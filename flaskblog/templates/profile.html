@@ -4,6 +4,9 @@
         <img class="rounded-circle article-img" src="{{ user.image_file }}">
         <div class="media-body">
             <h1 style="text-transform:uppercase">{{ user.username }}</h1>
+            {% if user.bio != None %}
+                <h2>{{ user.bio|mention_links }}</h2>
+            {% endif %}    
             <p>{{ user.subscribers|length }}</p>
 
             <div>
