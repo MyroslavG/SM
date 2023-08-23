@@ -11,7 +11,6 @@ function updateLikeCount(action, post_id) {
         },
         error: function(xhr) {
             if (xhr.status === 401) {
-                // User is not logged in, redirect to login page
                 window.location.href = 'users.login';
             } else {
                 console.error(error);
@@ -35,7 +34,7 @@ function toggleLikeButtons(post_id, action) {
 
 function toggleCollapsibleContent(post_id) {
     var content = document.getElementById("comments-" + post_id);
-    content.classList.toggle("active"); // Toggle the active class
+    content.classList.toggle("active");
     updateComments(post_id);
 }
 
@@ -48,14 +47,12 @@ function submitComment(post_id) {
         url: '/post/' + post_id + '/comment',
         data: {'comment_text': commentText},
         success: function(response) {
-            // Clear the input field and update the comments section
             jQuery('#comment-count-' + post_id).text(response.comments);
             commentInput.value = "";
             updateComments(post_id);
         },
         error: function(xhr) {
             if (xhr.status === 401) {
-                // User is not logged in, redirect to login page
                 window.location.href = 'users.login';
             } else {
                 console.error(error);
@@ -64,7 +61,7 @@ function submitComment(post_id) {
     });
 }
 
-var updatingComments = false; // Flag to track if an update is in progress
+var updatingComments = false;
 
 function updateComments(post_id) {
     if (!updatingComments) {
@@ -81,7 +78,8 @@ function updateComments(post_id) {
 
 $(document).ready(function() {
     $('.delete-comment-btn').click(function() {
-        var commentId = $(this).closest('.delete-comment-form').data('comment-id');
+        var commentId = $(this).data('comment-id');
+        var postId = $(this).data('post-id');
         
         $.ajax({
             type: 'POST',
@@ -89,7 +87,7 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.status === 'success') {
                     // Reload the comments section after successful deletion
-                    updateComments(post_id);
+                    updateComments(postId);
                 } else {
                     alert(response.message);  // Show error message
                 }

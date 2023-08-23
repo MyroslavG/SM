@@ -167,4 +167,7 @@ def search():
             pass
     return render_template('search.html', form=form)
 
-    
+@users.route('/achievements', methods=['GET', 'POST'])
+def achievements():           
+
+    return render_template('achievements.html')    

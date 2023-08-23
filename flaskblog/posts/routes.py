@@ -54,7 +54,7 @@ def update_post(post_id):
         if form.media.data: 
             image = request.files["media"]
             uploaded_file = save_picture(image)
-        post.media = uploaded_file    
+            post.media = uploaded_file 
         db.session.commit()
         flash('YOUR POST HAS BEEN UPDATED!', 'success')
         return redirect(url_for('posts.post', post_id=post.id))
@@ -104,42 +104,6 @@ def like_post(post_id):
                 logging.exception(e)
         return jsonify({'likes': len(post.likes)})    
 
-'''@posts.route('/like_post/<int:post_id>', methods=['GET'])
-@login_required
-def like_post(post_id):
-    post = Post.query.filter_by(id=post_id)
-    like = Like.query.filter_by(
-        author=current_user.id, post_id=post_id).first()
-    if not post:
-        flash('POST DOES NOT EXIST', 'danger')
-    elif like:
-        db.session.delete(like)
-        db.session.commit()
-    else:
-        like = Like(author=current_user.id, post_id=post_id)    
-        db.session.add(like)
-        db.session.commit()
-    return redirect(url_for('main.home'))    
-
-@posts.route('/profile_like_post/<string:username>/<int:post_id>', methods=['GET'])
-@login_required
-def profile_like_post(username, post_id):
-    decoded_username = urllib.parse.unquote(username)
-    user = User.query.filter_by(username=decoded_username).first()
-    post = Post.query.filter_by(id=post_id, user_id=user.id)
-    like = Like.query.filter_by(
-        author=current_user.id, post_id=post_id).first()
-    if not post:
-        flash('POST DOES NOT EXIST', 'danger')
-    elif like:
-        db.session.delete(like)
-        db.session.commit()
-    else:
-        like = Like(author=current_user.id, post_id=post_id)    
-        db.session.add(like)
-        db.session.commit()
-    return redirect(url_for('users.profile', username=username))   ''' 
-
 @posts.route('/post/<int:post_id>/comment', methods=['POST'])
 @login_required
 def add_comment(post_id):
@@ -159,7 +123,7 @@ def get_comments(post_id):
 @posts.route('/post/<int:post_id>/comment/<int:comment_id>/delete', methods=['GET', 'POST'])
 @login_required
 def delete_comment(post_id, comment_id):
-    comment = Comment.query.get_or_404(comment_id)
+    comment = Comment.query.filter_by(id=comment_id, post_id=post_id).first_or_404()
     if comment.user != current_user:
         return jsonify({'status': 'error', 'message': 'You are not authorized to delete this comment.'}), 403
     
@@ -175,3 +139,24 @@ def trending():
     ).outerjoin(Like).group_by(Post).order_by(desc('like_count')).all()
 
     return render_template('trending.html', posts=most_liked_posts)    
+
+'''@app.route('/upload_story', methods=['POST'])
+def upload_story():
+    if request.method == 'POST':
+        image_url = request.form['image_url']
+        user_id = 1  # Replace with actual user ID
+        expiration_time = datetime.datetime.now() + datetime.timedelta(hours=24)
+        stories.append({'image_url': image_url, 'user_id': user_id, 'expiration_time': expiration_time})
+        return redirect(url_for('main.home'))'''
+
+@posts.route('/recommendations')
+@login_required 
+def recommendations():
+    user = current_user  # Get the current logged-in user
+    subscriptions = user.subscribed_to # Assuming you have a relationship named 'subscriptions'
+    recommended_posts = []
+
+    for subscription in subscriptions:
+        recommended_posts.extend(subscription.subscribed_to.posts)
+
+    return render_template('recommendations.html', posts=recommended_posts)

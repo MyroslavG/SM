@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block content %}
+    <h1 style="text-transform:uppercase">RECOMMENDATIONS</h1>
+    {% for post in posts %}
+        {% with post=post %}
+            {% include "article.html" %}
+        {% endwith %}
+    {% endfor %}  
+{% endblock content %}  

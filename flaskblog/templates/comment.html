@@ -13,9 +13,9 @@
         <div class="comment-actions">
             {% if current_user.is_authenticated %}
                 {% if current_user == comment.user %}
-                    <form class="delete-comment-form" data-comment-id="{{ comment.id }}">
-                        <button type="button" class="btn btn-danger btn-sm delete-comment-btn">DELETE</button>
-                    </form>
+                    <button class="btn btn-danger btn-sm delete-comment-btn" data-post-id="{{ post.id }}" data-comment-id="{{ comment.id }}">
+                        DELETE
+                    </button>
                 {% endif %}
             {% endif %}    
         </div>    
